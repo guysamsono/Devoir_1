@@ -4,6 +4,16 @@ import sympy as sp
 
 def first_order(n_points=100, ri=0, ro=0.5, s=2e-8, d_eff=1e-10,ce=20):
 
+    '''
+    Schéma de résolution d'ordre 1
+    
+    :param n_points: nombre de noeuds
+    :param ri: rayon initial (r = 0m)
+    :param ro: rayon final (r = 0.5m)
+    :param s: terme source
+    :param d_eff: coefficient de diffusion dans le béton
+    :param ce: concentration à la surface du béton
+    '''
     discretization = np.linspace(ri, ro, n_points)
     dr = discretization[1] - discretization[0]
 
@@ -27,6 +37,17 @@ def first_order(n_points=100, ri=0, ro=0.5, s=2e-8, d_eff=1e-10,ce=20):
 
 def second_order(n_points=100, ri=0, ro=0.5, s=2e-8, d_eff=1e-10,ce=20):
 
+    '''
+    Schéma de résolution d'ordre 1
+    
+    :param n_points: nombre de noeuds
+    :param ri: rayon initial (r = 0m)
+    :param ro: rayon final (r = 0.5m)
+    :param s: terme source
+    :param d_eff: coefficient de diffusion dans le béton
+    :param ce: concentration à la surface du béton
+    '''
+    
     discretization = np.linspace(ri, ro, n_points)
     dr = discretization[1] - discretization[0]
 

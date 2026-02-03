@@ -29,7 +29,7 @@ def plotter(discretization,concentration_vect,order, ri=0, ro=0.5, s=2e-8, d_eff
         concentration_vect_analytique[i] = concentration_analytique.subs(r,rayon_vect[i])
 
     plt.plot(rayon_vect,concentration_vect_analytique, label = 'solution analytique')
-    plt.scatter(discretization,concentration_vect, label = 'solution approchée')
+    plt.scatter(discretization,concentration_vect, label = 'solution approchée', color = 'orange')
     plt.title(f"Profil de concentration dans une colone de béton grâce à un schéma d'ordre {order}")
     plt.legend()
     plt.show()
