@@ -2,14 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sympy as sp
 
-n_points = 100
-ri = 0 
-ro = 0.5
-ce = 20
-s = 2e-8
-rayon = 0.5
-d_eff = 1e-10
-
 def first_order(n_points=100, ri=0, ro=0.5, s=2e-8, d_eff=1e-10,ce=20):
 
     discretization = np.linspace(ri, ro, n_points)
