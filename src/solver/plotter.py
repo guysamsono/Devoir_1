@@ -2,7 +2,7 @@ import sympy as sp
 import numpy as np
 import matplotlib.pyplot as plt
 
-def plotter(discretization,concentration_vect,order, ri=0, ro=0.5, s=2e-8, d_eff=1e-10,ce=20):
+def plotter(discretization,concentration_vect,discretization_anal,concentration_analy, order, ri=0, ro=0.5, s=2e-8, d_eff=1e-10,ce=20):
 
     '''
     Fonction qui trace la solution approchée ainsi que la solution analytique
@@ -16,19 +16,10 @@ def plotter(discretization,concentration_vect,order, ri=0, ro=0.5, s=2e-8, d_eff
     :param d_eff: concentration de sel dans la structure poreuse d_eff = 1e-10
     :param ce: concentration de sel à la surface du béton
     '''
-    rayon = 0.5
-    s = 2e-8
-    n_point_analytique = 100
+  
+    
 
-    r = sp.symbols('r')
-    concentration_analytique = 0.25*s*rayon**2*(r**2/rayon**2 - 1)/d_eff + ce
-
-    concentration_vect_analytique = np.zeros(n_point_analytique)
-    rayon_vect = np.linspace(ri,ro,n_point_analytique)
-    for i in range(len(rayon_vect)):
-        concentration_vect_analytique[i] = concentration_analytique.subs(r,rayon_vect[i])
-
-    plt.plot(rayon_vect,concentration_vect_analytique, label = 'solution analytique')
+    plt.plot(discretization_anal,concentration_analy, label = 'solution analytique')
     plt.scatter(discretization,concentration_vect, label = 'solution approchée', color = 'orange')
     plt.title(f"Profil de concentration dans une colone de béton grâce à un schéma d'ordre {order}")
     plt.legend()

@@ -73,3 +73,10 @@ def second_order(n_points=100, ri=0, ro=0.5, s=2e-8, d_eff=1e-10,ce=20):
 
 discretization, concentration_vect = second_order()
 
+def analytique(n_points=100, ri=0, ro=0.5, s=2e-8, d_eff=1e-10,ce=20):
+    
+    discretization = np.linspace(ri, ro, n_points)
+    concentration_vect = 0.25*s*ro**2*(discretization**2/ro**2 - 1)/d_eff + ce
+    return  discretization, concentration_vect 
+
+discretization_anal, concentratio_analytique = analytique()
