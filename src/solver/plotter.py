@@ -2,7 +2,7 @@ import sympy as sp
 import numpy as np
 import matplotlib.pyplot as plt
 
-def plotter(discretization,concentration_vect,discretization_anal,concentration_analy, order, ri=0, ro=0.5, s=2e-8, d_eff=1e-10,ce=20):
+def plotter_sol(discretization,concentration_vect,discretization_anal,concentration_analy, order):
 
     '''
     Fonction qui trace la solution approchée ainsi que la solution analytique
