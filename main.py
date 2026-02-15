@@ -3,7 +3,7 @@ Fichier roulant le code nécessaire pour le devoir.
 """
 import numpy as np
 from src.solver.solver import first_order, second_order, analytique
-from src.solver.plotter import plotter, graph_error_log, graph_error_radius
+from src.postprocessing.plotter import plotter, graph_error_log, graph_error_radius, print_convergence_table
 from src.verif.error import norm_l1, norm_l2, norm_infinity
 
 params = {
@@ -72,3 +72,21 @@ if __name__ == "__main__":
     graph_error_radius(params, discretization, concentration_2,
                        concentration_a, order=2,
                        save_path="results/error_radius_order_2.png")
+
+    print_convergence_table(list_n_points, dr_list, l1_list_1,
+                            order=1, label="L1")
+
+    print_convergence_table(list_n_points, dr_list, l2_list_1,
+                            order=1, label="L2")
+
+    print_convergence_table(list_n_points, dr_list, linf_list_1,
+                            order=1, label="LInf")
+
+    print_convergence_table(list_n_points, dr_list, l1_list_2,
+                            order=2, label="L1")
+
+    print_convergence_table(list_n_points, dr_list, l2_list_2,
+                            order=2, label="L2")
+
+    print_convergence_table(list_n_points, dr_list, linf_list_2,
+                            order=2, label="LInf")

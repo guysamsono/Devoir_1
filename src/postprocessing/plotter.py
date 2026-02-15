@@ -74,7 +74,7 @@ def graph_error_radius(params:dict, discretization, concentration_vect,
                     save_path="results/temp.png",
                     show_fig=False):
     '''
-    Docstring for graph_error_radius
+    Fonction qui affiche le profil spatial de l'erreur.
     
     :param params: paramètres du problème
     :param discretization: position sur le rayon
@@ -97,3 +97,42 @@ def graph_error_radius(params:dict, discretization, concentration_vect,
     if show_fig:
         plt.show()
     plt.close()
+
+def print_convergence_table(n_points_list, dr_list,
+                            error_list, order=2,
+                            label="L2"):
+    '''
+    Fonction qui print une table de convergence.
+    
+    :param n_points_list: liste des nombres de points
+    :param dr_list: liste des discretisations
+    :param error_list: liste des erreur
+    :param label: label d'affichage
+    '''
+    import numpy as np
+
+    dr = np.array(dr_list)
+    err = np.array(error_list)
+
+    numerator = np.log(err[:-1] / err[1:])
+    denominator = np.log(dr[:-1] / dr[1:])
+    p_rates = numerator / denominator
+
+    print(f"\n{'='*60}")
+    print(f"ANALYSE DE CONVERGENCE DE L'ORDRE {order}: Norme {label}")
+    print(f"{'='*60}")
+
+    header = f"{'N points':^10} | {'dr [m]':^12} | {'Erreur':^12} | {'Ordre p':^10}"
+    print(header)
+    print(f"{'-'*11}|{'-'*14}|{'-'*14}|{'-'*12}")
+
+    print(f"{n_points_list[0]:^10} | {dr_list[0]:^12.2e} | {error_list[0]:^12.2e} | {'-':^10}")
+
+    for i in range(len(p_rates)):
+        n = n_points_list[i+1]
+        d = dr_list[i+1]
+        e = error_list[i+1]
+        p = p_rates[i]
+
+        print(f"{n:^10} | {d:^12.2e} | {e:^12.2e} | {p:^10.4f}")
+    print(f"{'='*60}\n")
