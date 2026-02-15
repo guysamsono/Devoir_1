@@ -3,7 +3,7 @@ Fichier roulant le code nécessaire pour le devoir.
 """
 import numpy as np
 from src.solver.solver import first_order, second_order, analytique
-from src.solver.plotter import graph_error_log, plotter
+from src.solver.plotter import plotter, graph_error_log, graph_error_radius
 from src.verif.error import norm_l1, norm_l2, norm_infinity
 
 params = {
@@ -15,11 +15,11 @@ params = {
 }
 
 N_POINTS_MIN=10
-N_POINTS_MAX=1000
-NB_SIMULATION=10
+N_POINTS_MAX=10000
+NB_SIMULATION=5
 
 if __name__ == "__main__":
-    list_nb_points = np.logspace(
+    list_n_points = np.logspace(
         np.log10(N_POINTS_MIN),
         np.log10(N_POINTS_MAX),
         NB_SIMULATION,
@@ -29,7 +29,7 @@ if __name__ == "__main__":
     l1_list_1, l2_list_1, linf_list_1 = [], [], []
     l1_list_2, l2_list_2, linf_list_2 = [], [], []
 
-    for n_points in list_nb_points:
+    for n_points in list_n_points:
         discretization_1, concentration_1 = first_order(params, n_points)
         discretization_2, concentration_2 = second_order(params,n_points)
         discretization_a, concentration_a = analytique(params,n_points)
@@ -48,14 +48,27 @@ if __name__ == "__main__":
         l2_list_2.append(norm_l2(concentration_2, concentration_a))
         linf_list_2.append(norm_infinity(concentration_2, concentration_a))
 
-    # Plots
-    plotter(params, discretization_2,
-            concentration_2, discretization_a,
-            concentration_a, order=2,
-            save_path="results/numeric_vs_analytic_order_2.png")
+        # Plots
+        plotter(params, discretization_1,
+                concentration_1, discretization_a,
+                concentration_a, order=1,
+                save_path=f"results/numeric_vs_analytic_order_1_npoints_{n_points}.png")
+
+        plotter(params, discretization_2,
+                concentration_2, discretization_a,
+                concentration_a, order=2,
+                save_path=f"results/numeric_vs_analytic_order_2_npoints_{n_points}.png")
 
     graph_error_log(params, dr_list, l1_list_1, l2_list_1, linf_list_1,
                     order=1, save_path="results/error_log_order_1.png")
 
     graph_error_log(params, dr_list, l1_list_2, l2_list_2, linf_list_2,
                     order=2, save_path="results/error_log_order_2.png")
+    
+    graph_error_radius(params, discretization, concentration_1,
+                       concentration_a, order=1,
+                       save_path="results/error_radius_order_1.png")
+    
+    graph_error_radius(params, discretization, concentration_2,
+                       concentration_a, order=2,
+                       save_path="results/error_radius_order_2.png")

@@ -58,6 +58,7 @@ def second_order(params:dict, n_points=100):
     a[0, 0] = -3
     a[0, 1] = 4
     a[0, 2] = -1
+    b[0] = 0.0
     a[-1, -1] = 1
     b[-1] = ce
 
