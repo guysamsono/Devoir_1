@@ -1,28 +1,65 @@
-import sympy as sp
-import numpy as np
+"""
+Fonctions servant à afficher les résultats.
+"""
 import matplotlib.pyplot as plt
 
-def plotter_sol(discretization,concentration_vect,discretization_anal,concentration_analy, order):
-
+def plotter(params:dict, discretization, concentration_vect,
+            discretization_a, concentration_a,
+            order, save_path="results/temp.png",
+            show_fig=False):
     '''
-    Fonction qui trace la solution approchée ainsi que la solution analytique
+    Fonction qui trace la solution approchée ainsi que la solution analytique.
     
+    :param params: paramètres du problème
     :param discretization: position sur le rayon
-    :param order: ordre du schéma (str)
     :param concentration_vect: résultat de concentration
-    :param ri: rayon initial
-    :param ro: rayon final
-    :param s: terme source s = 2e-8
-    :param d_eff: concentration de sel dans la structure poreuse d_eff = 1e-10
-    :param ce: concentration de sel à la surface du béton
+    :param discretization_a: position sur le rayon analytique
+    :param concentration_a: résultat de concentration analytique
+    :param order: ordre du schéma (str)
+    :save_path: path de sauvegarde de la figure
+    :show_fig: option pour afficher le graphique
     '''
-  
-    
-
-    plt.plot(discretization_anal,concentration_analy, label = 'solution analytique')
-    plt.scatter(discretization,concentration_vect, label = 'solution approchée', color = 'orange')
-    plt.title(f"Profil de concentration dans une colone de béton grâce à un schéma d'ordre {order}")
+    plt.figure(figsize=(8,6))
+    plt.plot(discretization_a, concentration_a, label='Solution analytique')
+    plt.scatter(discretization, concentration_vect, label='Solution approchée', color='orange')
+    plt.title(f"Profil de concentration dans une colonne de béton\n"
+             f"approximé par un schéma d'ordre {order}\n"
+             f"utilisant ri={params['RI']}, ro={params['RO']}, "
+             f"s={params['S']}, d_eff={params['D_EFF']}, ce={params['CE']}")
+    plt.xlabel(r"Rayon $r$ [$m$]")
+    plt.ylabel(r"Concentration $C$ [$mol/m^3$]")
+    plt.grid()
     plt.legend()
-    plt.show()
+    plt.savefig(save_path, dpi=300)
+    if show_fig:
+        plt.show()
 
+def graph_error_log(params:dict, discretization,
+                    l1_list, l2_list, linf_list,
+                    order, save_path="results/temp.png",
+                    show_fig=False):
+    '''
+    Fonction qui affiche les erreurs par rapport à la solution analytique.
     
+    :param params: paramètres du problème
+    :param discretization: position sur le rayon
+    :param l1_list: normes l1 aux positions
+    :param l2_list: normes l2 aux positions
+    :param linf_list: normes linfini aux positions
+    :param order: ordre du schéma (str)
+    :save_path: path de sauvegarde de la figure
+    :show_fig: option pour afficher le graphique
+    '''
+    plt.figure(figsize=(8,6))
+    plt.loglog(discretization, l1_list, 'o-', label=r"$L_1$")
+    plt.loglog(discretization, l2_list, 's-', label=r"$L_2$")
+    plt.loglog(discretization, linf_list, '^-', label=r"$L_\infty$")
+
+    plt.xlabel(r"Taille de maille $\Delta r$ [$m$]")
+    plt.ylabel(r"Erreur")
+    plt.title(f"Convergence de la solution numérique d'ordre {order}")
+    plt.grid()
+    plt.legend()
+    plt.savefig(save_path, dpi=300)
+    if show_fig:
+        plt.show()
