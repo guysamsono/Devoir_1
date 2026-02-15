@@ -88,8 +88,3 @@ def analytique(params:dict, n_points=100):
     discretization = np.linspace(ri, ro, n_points)
     concentration_vect = 0.25 * s * ro**2 * (discretization**2 / ro**2 - 1) / d_eff + ce
     return discretization, concentration_vect
-
-
-if __name__ == "__main__":
-    discretization_2, concentration_2 = second_order()
-    discretization_a, concentration_a = analytique()

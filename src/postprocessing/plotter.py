@@ -2,6 +2,7 @@
 Fonctions servant à afficher les résultats.
 """
 import matplotlib.pyplot as plt
+import numpy as np
 
 def plotter(params:dict, discretization, concentration_vect,
             discretization_a, concentration_a,
@@ -109,7 +110,6 @@ def print_convergence_table(n_points_list, dr_list,
     :param error_list: liste des erreur
     :param label: label d'affichage
     '''
-    import numpy as np
 
     dr = np.array(dr_list)
     err = np.array(error_list)
@@ -128,11 +128,10 @@ def print_convergence_table(n_points_list, dr_list,
 
     print(f"{n_points_list[0]:^10} | {dr_list[0]:^12.2e} | {error_list[0]:^12.2e} | {'-':^10}")
 
-    for i in range(len(p_rates)):
+    for i, p in enumerate(p_rates):
         n = n_points_list[i+1]
         d = dr_list[i+1]
         e = error_list[i+1]
-        p = p_rates[i]
 
         print(f"{n:^10} | {d:^12.2e} | {e:^12.2e} | {p:^10.4f}")
     print(f"{'='*60}\n")
