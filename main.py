@@ -1,50 +1,61 @@
+"""
+Fichier roulant le code nécessaire pour le devoir.
+"""
 import numpy as np
+from src.solver.solver import first_order, second_order, analytique
+from src.solver.plotter import graph_error_log, plotter
+from src.verification.error import norm_l1, norm_l2, norm_infinity
 
-from src.solver.solver import*
-from src.solver.plotter import*
-from src.Verification.error import*
-import matplotlib.pyplot as plt
+params = {
+    "RI": 0,
+    "RO": 0.5,
+    "S": 2e-8,
+    "D_EFF": 1e-10,
+    "CE": 20
+}
 
-N_list = np.unique(np.round(np.logspace(1, 4, 9)).astype(int))  
+N_POINTS_MIN=10
+N_POINTS_MAX=1000
+NB_SIMULATION=10
 
+if __name__ == "__main__":
+    list_nb_points = np.logspace(
+        np.log10(N_POINTS_MIN),
+        np.log10(N_POINTS_MAX),
+        NB_SIMULATION,
+        dtype=int)
 
-# discretization, concentration_vect = second_order(10000)
-# discretization_anal, concentration_analytique = analytique(10000)
+    dr_list = []
+    l1_list_1, l2_list_1, linf_list_1 = [], [], []
+    l1_list_2, l2_list_2, linf_list_2 = [], [], []
 
-# plotter_sol(discretization,concentration_vect,discretization_anal,concentration_analytique,2)
+    for n_points in list_nb_points:
+        discretization_1, concentration_1 = first_order(params, n_points)
+        discretization_2, concentration_2 = second_order(params,n_points)
+        discretization_a, concentration_a = analytique(params,n_points)
 
-# normL2 = normL2(discretization,concentration_vect,concentration_analytique)
+        discretization = np.linspace(params["RI"], params["RO"], n_points)
+        dr = discretization[1] - discretization[0]
+        dr_list.append(dr)
 
-# print(normL2)
+        # First order norms
+        l1_list_1.append(norm_l1(concentration_1, concentration_a))
+        l2_list_1.append(norm_l2(concentration_1, concentration_a))
+        linf_list_1.append(norm_infinity(concentration_1, concentration_a))
 
-###Analyse de convergence
+        # Second order norms
+        l1_list_2.append(norm_l1(concentration_2, concentration_a))
+        l2_list_2.append(norm_l2(concentration_2, concentration_a))
+        linf_list_2.append(norm_infinity(concentration_2, concentration_a))
 
-E1 = []
-E2 = []
-Einf = []
-h_list = []
+    # Plots
+    plotter(params, discretization_2,
+            concentration_2, discretization_a,
+            concentration_a, order=2,
+            save_path="results/numeric_vs_analytic_order_2.png")
 
-for N in N_list:
-    dis_num, c_num = first_order(N)
-    dis_ana, c_ana = analytique(N)
+    graph_error_log(params, dr_list, l1_list_1, l2_list_1, linf_list_1,
+                    order=1, save_path="results/error_log_order_1.png")
 
-
-    h = abs(dis_num[1] - dis_num[0])
-    h_list.append(h)
-
-    E1.append(normL1(dis_num,c_num,c_ana))
-    E2.append(normL2(dis_num,c_num,c_ana))
-    Einf.append(norm_Infinity(dis_num,c_num,c_ana))
-
-
-plt.figure()
-plt.loglog(h_list, E1, 'o-', label='L1')
-plt.loglog(h_list, E2, 's-', label='L2')
-plt.loglog(h_list, Einf, '^-', label='L∞')
-plt.gca().invert_xaxis()  # h diminue vers la droite (optionnel mais courant)
-plt.xlabel("h")
-plt.ylabel("Erreur")
-plt.title("Convergence (erreur vs h)")
-plt.grid(True, which="both")
-plt.legend()
-plt.show()
+    graph_error_log(params, dr_list, l1_list_2, l2_list_2, linf_list_2,
+                    order=2, save_path="results/error_log_order_2.png")
