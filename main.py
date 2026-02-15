@@ -4,7 +4,7 @@ Fichier roulant le code nécessaire pour le devoir.
 import numpy as np
 from src.solver.solver import first_order, second_order, analytique
 from src.solver.plotter import graph_error_log, plotter
-from src.verification.error import norm_l1, norm_l2, norm_infinity
+from src.verif.error import norm_l1, norm_l2, norm_infinity
 
 params = {
     "RI": 0,
