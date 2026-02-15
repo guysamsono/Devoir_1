@@ -1,6 +1,7 @@
 """
 Fichier roulant le code nécessaire pour le devoir.
 """
+import os
 import numpy as np
 from src.solver.solver import first_order, second_order, analytique
 from src.postprocessing.plotter import plotter, graph_error_log, graph_error_radius, print_convergence_table
@@ -19,6 +20,9 @@ N_POINTS_MAX=10000
 NB_SIMULATION=5
 
 if __name__ == "__main__":
+    # Créer le dossier results s'il n'existe pas
+    os.makedirs("results", exist_ok=True)
+    
     list_n_points = np.logspace(
         np.log10(N_POINTS_MIN),
         np.log10(N_POINTS_MAX),
