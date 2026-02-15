@@ -1,37 +1,37 @@
+"""
+Module de calcul des normes d'erreur (L1, L2, Infini).
+"""
 import numpy as np
 
+def norm_l1(concentration, concentration_analytique):
+    """
+    Calcule la norme L1 (moyenne des erreurs absolues).
 
-def normL1(discretization,concentration,concentration_analytique):
-    norm = 0
-    nb_points = len(discretization)
-
-    for i in range(len(discretization)):
-        
-        norm += abs(concentration[i] - concentration_analytique[i])
-    norm /= nb_points
-
-    return norm
-
-def normL2(discretization,concentration,concentration_analytique):
-
-    norm = 0 
-    nb_points = len(discretization)
-    for i in range(len(discretization)):
-        norm += (concentration[i] - concentration_analytique[i])**2
-        
-    norm /= nb_points
-    norm  = norm**(1/2)
-    return norm
+    :param concentration: Solution numérique
+    :param concentration_analytique: Solution analytique
+    :return: Norme L1
+    """
+    return np.mean(np.abs(concentration - concentration_analytique))
 
 
-def norm_Infinity(discretization,concentration,concentration_analytique):
-    norm = 0
-    error = 0
+def norm_l2(concentration, concentration_analytique):
+    """
+    Calcule la norme L2 (erreur quadratique moyenne).
 
-    for i in range(len(discretization)):
-        error = abs(concentration[i] - concentration_analytique[i])
-        if error > norm:
-            norm = error
-    return norm
+    :param concentration: Solution numérique
+    :param concentration_analytique: Solution analytique
+    :return: Norme L2
+    """
+    diff = concentration - concentration_analytique
+    return np.sqrt(np.mean(diff**2))
 
 
+def norm_infinity(concentration, concentration_analytique):
+    """
+    Calcule la norme infinie (erreur maximale absolue).
+
+    :param concentration: Solution numérique
+    :param concentration_analytique: Solution analytique
+    :return: Norme Infinie
+    """
+    return np.max(np.abs(concentration - concentration_analytique))
