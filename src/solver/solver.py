@@ -25,6 +25,7 @@ def first_order(params:dict, n_points=100):
     a[0, 1] = 1
     a[-1, -1] = 1
     b[-1] = ce
+    b[0] = 0
 
     for i in range(1, n_points - 1):
         r_i = discretization[i]
