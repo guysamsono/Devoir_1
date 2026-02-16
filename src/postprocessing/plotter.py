@@ -85,10 +85,11 @@ def graph_error_radius(params:dict, discretization, concentration_vect,
     :save_path: path de sauvegarde de la figure
     :show_fig: option pour afficher le graphique
     '''
+    n_points = len(discretization)
     error_local = concentration_vect - concentration_a
     plt.figure(figsize=(8,6))
     plt.plot(discretization, error_local)
-    plt.title(f"Profil spatial de l'erreur de la solution numérique d'ordre {order}\n"
+    plt.title(f"Profil spatial de l'erreur de la solution numérique d'ordre {order} avec {n_points} points\n"
               f"utilisant ri={params['RI']}, ro={params['RO']}, "
               f"s={params['S']}, d_eff={params['D_EFF']}, ce={params['CE']}")
     plt.xlabel(r"Rayon $r$ [$m$]")
