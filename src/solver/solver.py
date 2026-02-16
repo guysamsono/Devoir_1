@@ -29,9 +29,12 @@ def first_order(params:dict, n_points=100):
 
     for i in range(1, n_points - 1):
         r_i = discretization[i]
-        a[i, i-1] = d_eff / (dr**2)
-        a[i, i] = -2 * d_eff / (dr**2) - d_eff / (r_i * dr)
-        a[i, i+1] = d_eff / (r_i * dr) + d_eff / (dr**2)
+
+        a[i, i-1] = d_eff * (r_i / dr**2)
+        a[i, i]   = d_eff * (-2*r_i / dr**2 - 1/dr)
+        a[i, i+1] = d_eff * (r_i / dr**2 + 1/dr)
+
+        b[i]      = s * r_i
 
     concentration_vect = np.linalg.solve(a, b)
 
