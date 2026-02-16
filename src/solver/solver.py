@@ -21,12 +21,18 @@ def first_order(params:dict, n_points=100):
     a = np.zeros((n_points, n_points))
     b = np.ones(n_points) * s
 
-    a[0, 0] = -1
-    a[0, 1] = 1
+    if ri == 0: 
+        a[0, 0] = -1
+        a[0, 1] = 1
+        b[0] = 0
+    
+    else:
+        b[0] = ce
+        a[0, 0] = 1 
+    
     a[-1, -1] = 1
     b[-1] = ce
-    b[0] = 0
-
+    
     for i in range(1, n_points - 1):
         r_i = discretization[i]
         a[i, i-1] = d_eff / (dr**2)
@@ -56,10 +62,16 @@ def second_order(params:dict, n_points=100):
     a = np.zeros((n_points, n_points))
     b = np.ones(n_points) * s
 
-    a[0, 0] = -3
-    a[0, 1] = 4
-    a[0, 2] = -1
-    b[0] = 0.0
+    if ri == 0: 
+        a[0, 0] = -3
+        a[0, 1] = 4
+        a[0, 2] = -1
+        b[0] = 0.0
+    
+    else:
+        b[0] = ce
+        a[0, 0] = 1 
+
     a[-1, -1] = 1
     b[-1] = ce
 

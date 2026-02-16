@@ -7,6 +7,7 @@ from src.solver.solver import first_order, second_order, analytique
 from src.postprocessing.plotter import (plotter, graph_error_log,
                                         graph_error_radius, print_convergence_table)
 from src.verif.error import norm_l1, norm_l2, norm_infinity
+from src.verif.symetrie import gen_symetrie
 
 params = {
     "RI": 0,
@@ -64,7 +65,10 @@ if __name__ == "__main__":
                     concentration_2, discretization_a,
                     concentration_a, order=2,
                     save_path=f"results/numeric_vs_analytic_order_2_npoints_{n_points}.png")
-
+    
+    # Vérification de symétrie
+    gen_symetrie(params)
+    
     # Plots
     graph_error_log(params, dr_list, l1_list_1, l2_list_1, linf_list_1,
                     order=1, save_path="results/error_log_order_1.png")
