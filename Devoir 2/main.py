@@ -44,13 +44,12 @@ if __name__ == "__main__":
         f_exacte=f_C_exacte
     )
     
-    # Évaluation de la solution analytique exacte
-    # Le solveur actuel (solver.py) retourne la concentration à l'instant final TF
-    # On évalue donc la solution MMS exacte à t = TF pour comparer
-    concentration_exacte = f_C_exacte(params["TF"], discretisation)
+    # Évaluation de la solution analytique exacte sur TOUT le domaine spatio-temporel
+    grille_temps, grille_espace = np.meshgrid(tableau_temps, discretisation, indexing='ij')
+    concentration_exacte_2d = f_C_exacte(grille_temps, grille_espace)
 
-    # Calcul de l'erreur
-    erreur_l2 = norm_l2(concentration_num_2d, concentration_exacte)
+    # Calcul de l'erreur avec une double sommation (Matrice 2D vs Matrice 2D)
+    erreur_l2 = norm_l2(concentration_num_2d, concentration_exacte_2d)
 
-    # Impression de l'erreur
+    # Impression de l'erreur pour la lecture bash (NE PAS MODIFIER)
     print(f"The absolute error = {erreur_l2}")
