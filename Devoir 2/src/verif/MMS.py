@@ -12,7 +12,7 @@ D_eff = 1e-10
 K = 4e-9
 
 # Définition des variables symboliques
-t, r = sp.symbols('t r')
+t, r,R = sp.symbols('t r R')
 
 # Solution manufacturée
 C_MMS = Ce + 10*sp.exp(-t*0.001)*(1-(r/R)**2)  
@@ -53,9 +53,9 @@ f_C_MMS = sp.lambdify([t, r], C_MMS, "numpy")
 f_source = sp.lambdify([t, r], source, "numpy")
 
 # Définition des paramètres
-tmin, tmax = 0, 100
+tmin, tmax = 0, 2000
 rmin, rmax = 0, 0.5
-nt, nr = 50, 50
+nt, nr = 100, 100
 
 # Création des maillages temporel et spatial
 tdom = np.linspace(tmin, tmax, nt)
@@ -66,19 +66,23 @@ ti, ri = np.meshgrid(tdom, rdom, indexing='ij')
 z_MMS = f_C_MMS(ti, ri)
 z_source = f_source(ti, ri)  # Supposons alpha = 1 pour visualisation
 
-# Tracé des résultats
+# Tracé de la solution manufacturée
 plt.figure()
-plt.contourf(ri, ti, z_MMS, levels=50)
-plt.colorbar()
-plt.title('Solution Manufacturée')
-plt.xlabel('X')
-plt.ylabel('t')
+contour1 = plt.contourf(ri, ti, z_MMS, levels=50)
+cbar1 = plt.colorbar(contour1)
+cbar1.set_label('Concentration [mol/m³]')
+plt.title('Solution manufacturée C(t,r)')
+plt.xlabel('r [m]')
+plt.ylabel('t [s]')
 plt.show()
 
+
+# Tracé du terme source
 plt.figure()
-plt.contourf(ri, ti, z_source, levels=50)
-plt.colorbar()
-plt.title('Terme Source')
-plt.xlabel('X')
-plt.ylabel('t')
+contour2 = plt.contourf(ri, ti, z_source, levels=50)
+cbar2 = plt.colorbar(contour2)
+cbar2.set_label('Source S(t,r) [mol m⁻³ s⁻¹]')
+plt.title('Terme source de la MMS')
+plt.xlabel('r [m]')
+plt.ylabel('t [s]')
 plt.show()
