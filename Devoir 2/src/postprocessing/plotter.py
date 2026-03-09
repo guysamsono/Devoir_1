@@ -4,9 +4,8 @@ Fonctions servant à afficher les résultats.
 import matplotlib.pyplot as plt
 import numpy as np
 
-def plotter(params:dict, discretization, concentration_vect,
-            discretization_a, concentration_a,
-            order, save_path="results/temp.png",
+def plotter(params:dict, discretization, concentration_vect, order,
+            discretization_a=None, concentration_a=None, save_path="results/temp.png",
             show_fig=False):
     '''
     Fonction qui trace la solution approchée ainsi que la solution analytique.
@@ -22,12 +21,13 @@ def plotter(params:dict, discretization, concentration_vect,
     '''
     n_points = len(discretization)
     plt.figure(figsize=(8,6))
-    plt.plot(discretization_a, concentration_a, label='Solution analytique')
+    if discretization_a is not None and concentration_a is not None:
+        plt.plot(discretization_a, concentration_a, label='Solution analytique')
     plt.scatter(discretization, concentration_vect, label='Solution approchée', color='orange')
     plt.title(f"Profil de concentration dans une colonne de béton\n"
-             f"approximé par un schéma d'ordre {order} avec {n_points} points\n"
+             f"approximé par un schéma d'ordre {order} avec {n_points-1} intervalles\n"
              f"utilisant ri={params['RI']}, ro={params['RO']}, "
-             f"s={params['S']}, d_eff={params['D_EFF']}, ce={params['CE']}")
+             f" d_eff={params['D_EFF']}, ce={params['CE']}")
     plt.xlabel(r"Rayon $r$ [$m$]")
     plt.ylabel(r"Concentration $C$ [$mol/m^3$]")
     plt.grid()
