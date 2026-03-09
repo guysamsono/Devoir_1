@@ -2,6 +2,7 @@
 Fonctions fournissant les solver numériques et analytique pour le problème de diffusion.
 """
 import numpy as np
+from scipy.linalg import solve_banded
 
 def first_order(params:dict, n_points=100, f_source=None, f_exacte=None):
     """
@@ -16,7 +17,7 @@ def first_order(params:dict, n_points=100, f_source=None, f_exacte=None):
     ro = params["RO"]
     ce = params["CE"]
     d_eff = params["D_EFF"]
-    K = params["K"]
+    k = params["K"]
     dt = params["DT"]
     tf = params["TF"]
 
@@ -37,14 +38,16 @@ def first_order(params:dict, n_points=100, f_source=None, f_exacte=None):
     while temps < tf:
         temps += dt  
         
-        a = np.zeros((n_points, n_points))
+        lower = np.zeros(n_points - 1)
+        diag = np.zeros(n_points)
+        upper = np.zeros(n_points - 1)
         b = np.zeros(n_points) 
 
-        a[0, 0] = -1
-        a[0, 1] = 1
+        diag[0] = -1.0
+        upper[0] = 1.0
         b[0] = 0
 
-        a[-1, -1] = 1
+        diag[-1] = 1.0
         b[-1] = ce
 
         lam = d_eff*dt/(dr**2)
@@ -52,9 +55,9 @@ def first_order(params:dict, n_points=100, f_source=None, f_exacte=None):
             r_i = discretization[i]
             mu = d_eff*dt/(r_i*dr)
 
-            a[i, i-1] = -lam
-            a[i, i] = 1 + K*dt + 2*lam + mu
-            a[i, i+1] = - lam - mu
+            lower[i - 1] = -lam
+            diag[i] = 1 + k * dt + 2 * lam + mu
+            upper[i] = -lam - mu
             
             # Évaluation et ajout du terme source
             source_val = 0
@@ -63,7 +66,12 @@ def first_order(params:dict, n_points=100, f_source=None, f_exacte=None):
                 
             b[i] = concentration_vect[i] + (source_val * dt)
 
-        concentration_vect = np.linalg.solve(a, b)
+        ab = np.zeros((3, n_points))
+        ab[0, 1:] = upper
+        ab[1, :] = diag
+        ab[2, :-1] = lower
+
+        concentration_vect = solve_banded((1, 1), ab, b)
         
         # Sauvegarde de l'état
         historique_concentration.append(concentration_vect.copy())
