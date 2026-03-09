@@ -10,19 +10,22 @@ import os
 
 # Fonction pour lire des fichiers de données
 def reading_files():
-    # 1. Lecture des erreurs absolues
-    with open('src/bash/erreurs', 'r') as fichier1:
-        errors = [float(ligne) for ligne in fichier1.read().splitlines() if ligne.strip()]
+    # Chargement des 3 normes dans un dictionnaire
+    norms = {}
+    for n in ['l1', 'l2', 'inf']:
+        with open(f'src/bash/erreurs_{n}', 'r') as f:
+            norms[n] = [float(l) for l in f.read().splitlines() if l.strip()]
 
-    # 2. Lecture des nœuds spatiaux (nr) et temporels (nt)
-    with open('src/bash/liste_des_resolutions', 'r') as fichier2:
-        lignes = fichier2.read().splitlines()
-        nr_list = [int(ligne.split()[0]) for ligne in lignes if ligne.strip()]
-        nt_list = [int(ligne.split()[1]) for ligne in lignes if ligne.strip()]
+    # Lecture des résolutions (inchangé)
+    with open('src/bash/liste_des_resolutions', 'r') as f:
+        lignes = f.read().splitlines()
+        nr_list = [int(l.split()[0]) for l in lignes if l.strip()]
+        nt_list = [int(l.split()[1]) for l in lignes if l.strip()]
+        
+    return nr_list, nt_list, norms
 
-    return nr_list, nt_list, errors
-
-nr_list, nt_list, errors = reading_files()
+# CORRECTION ICI: On récupère 'norms' (le dictionnaire) au lieu de 'errors'
+nr_list, nt_list, norms = reading_files()
 
 # Paramètres du domaine physique
 RAYON = 0.5
@@ -30,6 +33,13 @@ TEMPS_FINAL = 100.0
 
 # Création du dossier de résultats
 os.makedirs("results", exist_ok=True)
+
+# Dictionnaire de configuration pour l'esthétique des 3 courbes
+configs_normes = {
+    'l1':  {'couleur': 'blue',   'marqueur': 'o', 'nom': '$L_1$'},
+    'l2':  {'couleur': 'green',  'marqueur': 's', 'nom': '$L_2$'},
+    'inf': {'couleur': 'orange', 'marqueur': '^', 'nom': r'$L_\infty$'}
+}
 
 # =========================================================
 # ANALYSE SPATIALE
@@ -39,33 +49,34 @@ indices_spatiaux = [i for i, nt in enumerate(nt_list) if nt == max_nt]
 
 # Si on a testé plusieurs nr pour ce temps gelé, on trace le graphique :
 if len(set([nr_list[i] for i in indices_spatiaux])) > 1:
-    h_values = [(RAYON - 0) / nr_list[i] for i in indices_spatiaux]
-    e_values = [errors[i] for i in indices_spatiaux]
-    
-    # Tri croissant pour la régression
-    h_values, e_values = zip(*sorted(zip(h_values, e_values)))
-    
-    # Régression linéaire sur le log (sur TOUS les points)
-    coeffs = np.polyfit(np.log(h_values), np.log(e_values), 1)
-    exp_spatial = coeffs[0]
+    h_values_raw = [(RAYON - 0) / nr_list[i] for i in indices_spatiaux]
     
     plt.figure(figsize=(8, 6))
-    plt.scatter(h_values, e_values, marker='o', color='blue', s=60, label='Données numériques')
-    plt.plot(h_values, np.exp(coeffs[1]) * np.array(h_values)**exp_spatial, 'r--', linewidth=2, label='Régression')
+    
+    # Boucle sur les 3 normes
+    for cle, config in configs_normes.items():
+        e_values_raw = [norms[cle][i] for i in indices_spatiaux]
+        
+        # Tri croissant pour la régression
+        h_values, e_values = zip(*sorted(zip(h_values_raw, e_values_raw)))
+        
+        # Régression linéaire sur le log (sur TOUS les points)
+        coeffs = np.polyfit(np.log(h_values), np.log(e_values), 1)
+        exp_spatial = coeffs[0]
+        
+        # Tracé des points et de la ligne (la pente est ajoutée au label)
+        label_texte = f"{config['nom']} (p={exp_spatial:.4f})"
+        plt.scatter(h_values, e_values, marker=config['marqueur'], color=config['couleur'], s=60)
+        plt.plot(h_values, np.exp(coeffs[1]) * np.array(h_values)**exp_spatial, '--', color=config['couleur'], linewidth=2, label=label_texte)
     
     plt.title(f"Convergence Spatiale ($N_t$={max_nt})", fontsize=14, fontweight='bold', y=1.02)
     plt.xlabel(r'$\Delta x$ (Pas spatial)', fontsize=12, fontweight='bold') 
-    plt.ylabel('Erreur $L_2$', fontsize=12, fontweight='bold')
-    
-    # Équation esthétique
-    eq_text = rf'$L_2 \propto \Delta x^{{{exp_spatial:.4f}}}$'
-    plt.text(0.5, 0.2, eq_text, fontsize=14, transform=plt.gca().transAxes, 
-             bbox=dict(facecolor='white', alpha=0.8, edgecolor='gray'))
+    plt.ylabel('Erreur', fontsize=12, fontweight='bold')
     
     plt.xscale('log')
     plt.yscale('log')
     plt.grid(True, which="both", ls="--", alpha=0.5)
-    plt.legend()
+    plt.legend(fontsize=12)
     
     # Esthétique des axes
     for spine in plt.gca().spines.values(): spine.set_linewidth(2)
@@ -83,33 +94,34 @@ indices_temporels = [i for i, nr in enumerate(nr_list) if nr == max_nr]
 
 # Si on a testé plusieurs nt pour cet espace gelé, on trace le graphique :
 if len(set([nt_list[i] for i in indices_temporels])) > 1:
-    dt_values = [TEMPS_FINAL / nt_list[i] for i in indices_temporels]
-    e_values = [errors[i] for i in indices_temporels]
-    
-    # Tri croissant pour la régression
-    dt_values, e_values = zip(*sorted(zip(dt_values, e_values)))
-    
-    # Régression linéaire sur le log (sur TOUS les points)
-    coeffs = np.polyfit(np.log(dt_values), np.log(e_values), 1)
-    exp_temporel = coeffs[0]
+    dt_values_raw = [TEMPS_FINAL / nt_list[i] for i in indices_temporels]
     
     plt.figure(figsize=(8, 6))
-    plt.scatter(dt_values, e_values, marker='s', color='green', s=60, label='Données numériques')
-    plt.plot(dt_values, np.exp(coeffs[1]) * np.array(dt_values)**exp_temporel, 'r--', linewidth=2, label='Régression')
+    
+    # Boucle sur les 3 normes
+    for cle, config in configs_normes.items():
+        e_values_raw = [norms[cle][i] for i in indices_temporels]
+        
+        # Tri croissant pour la régression
+        dt_values, e_values = zip(*sorted(zip(dt_values_raw, e_values_raw)))
+        
+        # Régression linéaire sur le log (sur TOUS les points)
+        coeffs = np.polyfit(np.log(dt_values), np.log(e_values), 1)
+        exp_temporel = coeffs[0]
+        
+        # Tracé des points et de la ligne (la pente est ajoutée au label)
+        label_texte = f"{config['nom']} (p={exp_temporel:.4f})"
+        plt.scatter(dt_values, e_values, marker=config['marqueur'], color=config['couleur'], s=60)
+        plt.plot(dt_values, np.exp(coeffs[1]) * np.array(dt_values)**exp_temporel, '--', color=config['couleur'], linewidth=2, label=label_texte)
     
     plt.title(f"Convergence Temporelle ($N_r$={max_nr})", fontsize=14, fontweight='bold', y=1.02)
     plt.xlabel(r'$\Delta t$ (Pas de temps)', fontsize=12, fontweight='bold') 
-    plt.ylabel('Erreur $L_2$', fontsize=12, fontweight='bold')
-    
-    # Équation esthétique
-    eq_text = rf'$L_2 \propto \Delta t^{{{exp_temporel:.4f}}}$'
-    plt.text(0.5, 0.2, eq_text, fontsize=14, transform=plt.gca().transAxes, 
-             bbox=dict(facecolor='white', alpha=0.8, edgecolor='gray'))
+    plt.ylabel('Erreur', fontsize=12, fontweight='bold')
     
     plt.xscale('log')
     plt.yscale('log')
     plt.grid(True, which="both", ls="--", alpha=0.5)
-    plt.legend()
+    plt.legend(fontsize=12)
     
     # Esthétique des axes
     for spine in plt.gca().spines.values(): spine.set_linewidth(2)

@@ -91,8 +91,10 @@ USAGE="Usage: ./src/bash/analyse_auto {nom_du_programme_sans_.py} {chemin_vers_l
 
   # extraction des erreurs absolues dans le fichier de compilation des resultats
   # et récriture de ces seules valeurs dans le fichier "erreurs"
-  grep 'absolute' src/bash/resultats | awk '{print $5}' > src/bash/erreurs
-
+  grep 'Error L1 =' src/bash/resultats | awk '{print $4}' > src/bash/erreurs_l1
+  grep 'Error L2 =' src/bash/resultats | awk '{print $4}' > src/bash/erreurs_l2
+  grep 'Error Linf =' src/bash/resultats | awk '{print $4}' > src/bash/erreurs_inf
+  
   echo ""
   echo "--> Exécution du script python..."
   echo ""

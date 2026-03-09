@@ -4,7 +4,7 @@ Fichier roulant le code nécessaire pour le devoir (Version Automatisée pour Ba
 import os
 import numpy as np
 from src.solver.solver import first_order, second_order
-from src.verif.error import norm_l2
+from src.verif.error import norm_l1, norm_l2, norm_infinity
 from src.verif.MMS import generer_mms
 
 params = {
@@ -48,8 +48,12 @@ if __name__ == "__main__":
     grille_temps, grille_espace = np.meshgrid(tableau_temps, discretisation, indexing='ij')
     concentration_exacte_2d = f_C_exacte(grille_temps, grille_espace)
 
-    # Calcul de l'erreur avec une double sommation (Matrice 2D vs Matrice 2D)
-    erreur_l2 = norm_l2(concentration_num_2d, concentration_exacte_2d)
+    # Calcul des trois normes
+    err_l1 = norm_l1(concentration_num_2d, concentration_exacte_2d)
+    err_l2 = norm_l2(concentration_num_2d, concentration_exacte_2d)
+    err_inf = norm_infinity(concentration_num_2d, concentration_exacte_2d)
 
     # Impression de l'erreur pour la lecture bash (NE PAS MODIFIER)
-    print(f"The absolute error = {erreur_l2}")
+    print(f"Error L1 = {err_l1}")
+    print(f"Error L2 = {err_l2}")
+    print(f"Error Linf = {err_inf}")

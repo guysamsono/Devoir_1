@@ -1,6 +1,6 @@
 Analyse de convergence:
 
-Résultats pour Espace=10, Temps=20000 :
+Résultats pour Espace=10, Temps=5000 :
 Dérivée en temps :
 -80.0*(0.25 - r**2)**2*exp(-t)
 Dérivée première :
@@ -18,8 +18,10 @@ Condition frontière T(t, R) :
 
 Condition frontière Neumann dT/dr(t, 0) :
 0
-The absolute error = 0.004862885420043312
-Résultats pour Espace=20, Temps=20000 :
+Error L1 = 0.004152323808910425
+Error L2 = 0.004940377109424783
+Error Linf = 0.00901385013112943
+Résultats pour Espace=20, Temps=5000 :
 Dérivée en temps :
 -80.0*(0.25 - r**2)**2*exp(-t)
 Dérivée première :
@@ -37,8 +39,10 @@ Condition frontière T(t, R) :
 
 Condition frontière Neumann dT/dr(t, 0) :
 0
-The absolute error = 0.001188556160480711
-Résultats pour Espace=40, Temps=20000 :
+Error L1 = 0.0010897414006665676
+Error L2 = 0.0012694091638358821
+Error Linf = 0.0022591708745416383
+Résultats pour Espace=40, Temps=5000 :
 Dérivée en temps :
 -80.0*(0.25 - r**2)**2*exp(-t)
 Dérivée première :
@@ -56,8 +60,10 @@ Condition frontière T(t, R) :
 
 Condition frontière Neumann dT/dr(t, 0) :
 0
-The absolute error = 0.00030766764151379626
-Résultats pour Espace=80, Temps=20000 :
+Error L1 = 0.0003328549462228048
+Error L2 = 0.0003901502315200553
+Error Linf = 0.0007395576987789809
+Résultats pour Espace=80, Temps=5000 :
 Dérivée en temps :
 -80.0*(0.25 - r**2)**2*exp(-t)
 Dérivée première :
@@ -75,8 +81,10 @@ Condition frontière T(t, R) :
 
 Condition frontière Neumann dT/dr(t, 0) :
 0
-The absolute error = 9.611853769279527e-05
-Résultats pour Espace=1000, Temps=100 :
+Error L1 = 0.00014893932904854173
+Error L2 = 0.0001808268614309537
+Error Linf = 0.00037636454709399914
+Résultats pour Espace=400, Temps=100 :
 Dérivée en temps :
 -80.0*(0.25 - r**2)**2*exp(-t)
 Dérivée première :
@@ -94,8 +102,10 @@ Condition frontière T(t, R) :
 
 Condition frontière Neumann dT/dr(t, 0) :
 0
-The absolute error = 0.005730617279551884
-Résultats pour Espace=1000, Temps=200 :
+Error L1 = 0.00443195192008368
+Error L2 = 0.0057336015008638
+Error Linf = 0.01287392071387572
+Résultats pour Espace=400, Temps=200 :
 Dérivée en temps :
 -80.0*(0.25 - r**2)**2*exp(-t)
 Dérivée première :
@@ -113,8 +123,10 @@ Condition frontière T(t, R) :
 
 Condition frontière Neumann dT/dr(t, 0) :
 0
-The absolute error = 0.002869425333320811
-Résultats pour Espace=1000, Temps=400 :
+Error L1 = 0.0022225689891819814
+Error L2 = 0.0028719760405772027
+Error Linf = 0.006448955403762113
+Résultats pour Espace=400, Temps=400 :
 Dérivée en temps :
 -80.0*(0.25 - r**2)**2*exp(-t)
 Dérivée première :
@@ -132,8 +144,10 @@ Condition frontière T(t, R) :
 
 Condition frontière Neumann dT/dr(t, 0) :
 0
-The absolute error = 0.0014379013404920485
-Résultats pour Espace=1000, Temps=800 :
+Error L1 = 0.0011155311021167152
+Error L2 = 0.001440238223923886
+Error Linf = 0.0032321300341493497
+Résultats pour Espace=400, Temps=800 :
 Dérivée en temps :
 -80.0*(0.25 - r**2)**2*exp(-t)
 Dérivée première :
@@ -151,8 +165,10 @@ Condition frontière T(t, R) :
 
 Condition frontière Neumann dT/dr(t, 0) :
 0
-The absolute error = 0.0007188969153231885
-Résultats pour Espace=1000, Temps=1600 :
+Error L1 = 0.0005588609604716102
+Error L2 = 0.0007211232689150262
+Error Linf = 0.001618273506853285
+Résultats pour Espace=400, Temps=1600 :
 Dérivée en temps :
 -80.0*(0.25 - r**2)**2*exp(-t)
 Dérivée première :
@@ -170,4 +186,6 @@ Condition frontière T(t, R) :
 
 Condition frontière Neumann dT/dr(t, 0) :
 0
-The absolute error = 0.0003595853808719778
+Error L1 = 0.0002805907886560976
+Error L2 = 0.0003617569804871225
+Error Linf = 0.0008114327306465441
