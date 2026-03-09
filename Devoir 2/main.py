@@ -22,24 +22,24 @@ if __name__ == "__main__":
     dossier_courant = os.path.dirname(os.path.abspath(__file__))
     os.makedirs(os.path.join(dossier_courant, "results"), exist_ok=True)
 
-    noeuds_spatiaux = 100
-    noeuds_temporels = 100
+    intervales_spatiaux = 100
+    intervales_temporels = 100
 
     # Ajout du paramètre de pas de temps (DT) au dictionnaire
-    params["DT"] = params["TF"] / noeuds_temporels
+    params["DT"] = params["TF"] / intervales_temporels
 
     # Appel de la fonction MMS pour générer les fonctions analytiques
     f_C_exacte, f_terme_source = generer_mms(
         params=params, 
-        nr=noeuds_spatiaux, 
-        nt=noeuds_temporels, 
+        nr=intervales_spatiaux, 
+        nt=intervales_temporels, 
         afficher_graphiques=False
     )
 
     # Appel du solveur numérique
     discretisation, tableau_temps, concentration_num_2d = second_order(
         params, 
-        noeuds_spatiaux, 
+        intervales_spatiaux, 
         f_source=f_terme_source, 
         f_exacte=f_C_exacte
     )
