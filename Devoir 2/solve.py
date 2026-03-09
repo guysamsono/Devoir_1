@@ -3,7 +3,7 @@ Fichier roulant le code nécessaire pour la question f du devoir 2.
 """
 import os
 from src.solver.solver import first_order, second_order
-from src.postprocessing.plotter import plotter
+from src.postprocessing.plotter import plotter, plotter_time
 
 params = {
     "RI": 0,
@@ -39,3 +39,9 @@ if __name__ == "__main__":
             order="2", save_path="results/profil_concentration_second_order.png")
     plotter(params, discretisation_first, concentration_num_2d_first[-1],
             order="1", save_path="results/profil_concentration_first_order.png")
+    
+    plotter_time(params, discretisation_second, tableau_temps_second, concentration_num_2d_second,
+             order="2", save_path="results/concentration_time_second_order.png")
+
+    plotter_time(params, discretisation_first, tableau_temps_first, concentration_num_2d_first,
+             order="1", save_path="results/concentration_time_first_order.png")

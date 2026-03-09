@@ -39,6 +39,41 @@ def plotter(params:dict, discretization, concentration_vect, order,
         plt.show()
     plt.close()
 
+def plotter_time(params: dict, discretization, time_vect, concentration_2d,
+                 order, save_path="results/temp_2d.png", show_fig=False):
+    '''
+    Fonction qui trace l'évolution spatio-temporelle de la concentration.
+
+    :param params: paramètres du problème
+    :param discretization: position sur le rayon
+    :param time_vect: vecteur temps
+    :param concentration_2d: concentration sous forme de matrice (temps x espace)
+    :param order: ordre du schéma (str)
+    :param save_path: path de sauvegarde de la figure
+    :param show_fig: option pour afficher le graphique
+    '''
+    plt.figure(figsize=(8,6))
+
+    # meshgrid pour le contourf
+    grille_temps, grille_espace = np.meshgrid(time_vect, discretization, indexing='ij')
+
+    contour = plt.contourf(grille_espace, grille_temps, concentration_2d, levels=50)
+    cbar = plt.colorbar(contour)
+    cbar.set_label(r"Concentration $C$ [$mol/m^3$]")
+
+    plt.title(f"Évolution de la concentration dans le temps\n"
+              f"schéma d'ordre {order} avec {len(discretization)-1} intervalles")
+    plt.xlabel(r"Rayon $r$ [$m$]")
+    plt.ylabel(r"Temps $t$ [$s$]")
+    plt.tight_layout()
+
+    os.makedirs("results", exist_ok=True)
+    plt.savefig(save_path, dpi=300)
+
+    if show_fig:
+        plt.show()
+    plt.close()
+
 def graph_error_log(params:dict, discretization,
                     l1_list, l2_list, linf_list,
                     order, save_path="results/temp.png",
