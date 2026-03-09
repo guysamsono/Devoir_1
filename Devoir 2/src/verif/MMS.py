@@ -20,7 +20,7 @@ def generer_mms(params: dict, nt: int, nr: int, afficher_graphiques: bool = Fals
     R = params.get("RO", 0.5)
     D_eff = params.get("D_EFF", 1e-10)
     K = params.get("K", 4e-9)
-    
+
     tmin = 0
     tmax = params.get("TF", 100)
     rmin = params.get("RI", 0)
@@ -30,7 +30,7 @@ def generer_mms(params: dict, nt: int, nr: int, afficher_graphiques: bool = Fals
     t, r = sp.symbols('t r')
 
     # Solution manufacturée
-    C_MMS = Ce + 5*sp.exp(-t)*(1-(r/R)**2)**2  
+    C_MMS = Ce + 5*sp.exp(-t)*(1-(r/R)**2)**2
 
     # Calcul des dérivées
     C_t = sp.diff(C_MMS, t)
@@ -72,7 +72,7 @@ def generer_mms(params: dict, nt: int, nr: int, afficher_graphiques: bool = Fals
 
     # Évaluation des fonctions sur le maillage pour les graphiques
     z_MMS = f_C_MMS(ti, ri)
-    z_source = f_source(ti, ri)  
+    z_source = f_source(ti, ri)
 
     # Graphique
     plt.figure()
@@ -90,6 +90,5 @@ def generer_mms(params: dict, nt: int, nr: int, afficher_graphiques: bool = Fals
     plt.xlabel('r')
     plt.ylabel('t')
     plt.savefig(f"{save_path}_source.png", dpi=300)
-
 
     return f_C_MMS, f_source

@@ -1,5 +1,7 @@
+"""
+Fichier roulant le code nécessaire pour la question f du devoir 2.
+"""
 import os
-import numpy as np
 from src.solver.solver import first_order, second_order
 from src.postprocessing.plotter import plotter
 
@@ -26,13 +28,14 @@ if __name__ == "__main__":
 
     # Appel du solveur numérique
     discretisation_second, tableau_temps_second, concentration_num_2d_second = second_order(
-        params, 
+        params,
         intervales_spatiaux)
     # Appel du solveur numérique
     discretisation_first, tableau_temps_first, concentration_num_2d_first = first_order(
-        params, 
+        params,
         intervales_spatiaux)
-    
-    plotter(params, discretisation_second, concentration_num_2d_second[-1], "2", save_path="results/profil_concentration_second_order.png")
-    plotter(params, discretisation_first, concentration_num_2d_first[-1], "1", save_path="results/profil_concentration_first_order.png")
-    
+
+    plotter(params, discretisation_second, concentration_num_2d_second[-1],
+            order="2", save_path="results/profil_concentration_second_order.png")
+    plotter(params, discretisation_first, concentration_num_2d_first[-1],
+            order="1", save_path="results/profil_concentration_first_order.png")
