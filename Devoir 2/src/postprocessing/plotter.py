@@ -3,6 +3,7 @@ Fonctions servant à afficher les résultats.
 """
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 
 def plotter(params:dict, discretization, concentration_vect, order,
             discretization_a=None, concentration_a=None, save_path="results/temp.png",
@@ -27,11 +28,12 @@ def plotter(params:dict, discretization, concentration_vect, order,
     plt.title(f"Profil de concentration dans une colonne de béton\n"
              f"approximé par un schéma d'ordre {order} avec {n_points-1} intervalles\n"
              f"utilisant ri={params['RI']}, ro={params['RO']}, "
-             f" d_eff={params['D_EFF']}, ce={params['CE']}")
+             f" d_eff={params['D_EFF']}, ce={params['CE']} au temps final")
     plt.xlabel(r"Rayon $r$ [$m$]")
     plt.ylabel(r"Concentration $C$ [$mol/m^3$]")
     plt.grid()
     plt.legend()
+    os.makedirs("results", exist_ok=True)
     plt.savefig(save_path, dpi=300)
     if show_fig:
         plt.show()
@@ -62,7 +64,7 @@ def graph_error_log(params:dict, discretization,
     plt.ylabel(r"Erreur")
     plt.title(f"Convergence de la solution numérique d'ordre {order}\n"
               f"utilisant ri={params['RI']}, ro={params['RO']}, "
-              f"s={params['S']}, d_eff={params['D_EFF']}, ce={params['CE']}")
+              f"s={params['S']}, d_eff={params['D_EFF']}, ce={params['CE']} au temps final")
     plt.grid()
     plt.legend()
     plt.savefig(save_path, dpi=300)

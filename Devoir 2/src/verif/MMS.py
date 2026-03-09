@@ -76,19 +76,23 @@ def generer_mms(params: dict, nt: int, nr: int, afficher_graphiques: bool = Fals
 
     # Graphique
     plt.figure()
-    plt.contourf(ri, ti, z_MMS, levels=50)
-    plt.colorbar()
-    plt.title('Solution Manufacturée')
-    plt.xlabel('r')
-    plt.ylabel('t')
+    contour1 = plt.contourf(ri, ti, z_MMS, levels=50)
+    cbar1 = plt.colorbar(contour1)
+    cbar1.set_label('Concentration C(t,r) [mol/m³]')
+    plt.title('Solution manufacturée')
+    plt.xlabel('Rayon r [m]')
+    plt.ylabel('Temps t [s]')
+    plt.tight_layout()
     plt.savefig(f"{save_path}_manufactured.png", dpi=300)
 
     plt.figure()
-    plt.contourf(ri, ti, z_source, levels=50)
-    plt.colorbar()
-    plt.title('Terme Source')
-    plt.xlabel('r')
-    plt.ylabel('t')
+    contour2 = plt.contourf(ri, ti, z_source, levels=50)
+    cbar2 = plt.colorbar(contour2)
+    cbar2.set_label('Terme source S(t,r) [mol/(m³·s)]')
+    plt.title('Terme source de la MMS')
+    plt.xlabel('Rayon r [m]')
+    plt.ylabel('Temps t [s]')
+    plt.tight_layout()
     plt.savefig(f"{save_path}_source.png", dpi=300)
 
     return f_C_MMS, f_source
