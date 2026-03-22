@@ -3,6 +3,7 @@ Fonctions servant à afficher les résultats.
 """
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 
 def plotter(params:dict, discretization, concentration_vect, order,
             discretization_a=None, concentration_a=None, save_path="results/temp.png",
@@ -27,12 +28,48 @@ def plotter(params:dict, discretization, concentration_vect, order,
     plt.title(f"Profil de concentration dans une colonne de béton\n"
              f"approximé par un schéma d'ordre {order} avec {n_points-1} intervalles\n"
              f"utilisant ri={params['RI']}, ro={params['RO']}, "
-             f" d_eff={params['D_EFF']}, ce={params['CE']}")
+             f" d_eff={params['D_EFF']}, ce={params['CE']} au temps final")
     plt.xlabel(r"Rayon $r$ [$m$]")
     plt.ylabel(r"Concentration $C$ [$mol/m^3$]")
     plt.grid()
     plt.legend()
+    os.makedirs("results", exist_ok=True)
     plt.savefig(save_path, dpi=300)
+    if show_fig:
+        plt.show()
+    plt.close()
+
+def plotter_time(params: dict, discretization, time_vect, concentration_2d,
+                 order, save_path="results/temp_2d.png", show_fig=False):
+    '''
+    Fonction qui trace l'évolution spatio-temporelle de la concentration.
+
+    :param params: paramètres du problème
+    :param discretization: position sur le rayon
+    :param time_vect: vecteur temps
+    :param concentration_2d: concentration sous forme de matrice (temps x espace)
+    :param order: ordre du schéma (str)
+    :param save_path: path de sauvegarde de la figure
+    :param show_fig: option pour afficher le graphique
+    '''
+    plt.figure(figsize=(8,6))
+
+    # meshgrid pour le contourf
+    grille_temps, grille_espace = np.meshgrid(time_vect, discretization, indexing='ij')
+
+    contour = plt.contourf(grille_espace, grille_temps, concentration_2d, levels=50)
+    cbar = plt.colorbar(contour)
+    cbar.set_label(r"Concentration $C$ [$mol/m^3$]")
+
+    plt.title(f"Évolution de la concentration dans le temps\n"
+              f"schéma d'ordre {order} avec {len(discretization)-1} intervalles")
+    plt.xlabel(r"Rayon $r$ [$m$]")
+    plt.ylabel(r"Temps $t$ [$s$]")
+    plt.tight_layout()
+
+    os.makedirs("results", exist_ok=True)
+    plt.savefig(save_path, dpi=300)
+
     if show_fig:
         plt.show()
     plt.close()
@@ -62,7 +99,7 @@ def graph_error_log(params:dict, discretization,
     plt.ylabel(r"Erreur")
     plt.title(f"Convergence de la solution numérique d'ordre {order}\n"
               f"utilisant ri={params['RI']}, ro={params['RO']}, "
-              f"s={params['S']}, d_eff={params['D_EFF']}, ce={params['CE']}")
+              f"s={params['S']}, d_eff={params['D_EFF']}, ce={params['CE']} au temps final")
     plt.grid()
     plt.legend()
     plt.savefig(save_path, dpi=300)
