@@ -21,7 +21,7 @@ from numba import njit, prange
 # FONCTION : Generate_sample
 # ==============================================================================
 
-def Generate_sample(seed, filename, mean_d, std_d, poro, nx, dx):
+def Generate_sample(seed, filename, mean_d, std_d, poro, nx, dx,plot = False):
     """
     Crée une structure 2D de fibres et l'exporte en format TIFF.
 
@@ -125,13 +125,14 @@ def Generate_sample(seed, filename, mean_d, std_d, poro, nx, dx):
     poremat_img = poremat.T   # (NY, NX) : lignes=y, colonnes=x
     Image.fromarray(poremat_img.astype(np.uint8) * 255).save(filename)
 
-    plt.figure(1)
-    plt.imshow(np.rot90(poremat_img, k=1), cmap='gray')
-    plt.title("Structure de fibres générée")
-    plt.axis('off')
-    plt.tight_layout()
-    plt.show(block=False)
-    plt.pause(0.5)
+    if plot:
+        plt.figure(1)
+        plt.imshow(np.rot90(poremat_img, k=1), cmap='gray')
+        plt.title("Structure de fibres générée")
+        plt.axis('off')
+        plt.tight_layout()
+        plt.show(block=False)
+        plt.pause(0.5)
 
     return d_equivalent
 
@@ -230,7 +231,7 @@ def _lbm_step(N, SOLID, W, cx, cy, NX, NY, deltaP, dx, rho0, dt, OMEGA, bb_idx):
 # FONCTION : LBM
 # ==============================================================================
 
-def LBM(filename, NX, deltaP, dx, d_equivalent):
+def LBM(filename, NX, deltaP, dx, d_equivalent, plot=False):
     """
     Calcule l'écoulement à travers le mat de fibres par la méthode LBM (D2Q9).
 
@@ -303,17 +304,18 @@ def LBM(filename, NX, deltaP, dx, d_equivalent):
     uy_2d    = uy_plot.reshape(NX, NY).T
     solid_2d = SOLID.reshape(NX, NY).T.astype(float)
 
-    fig, ax = plt.subplots(figsize=(7, 7))
-    ax.imshow(2 - solid_2d, cmap='gray', vmin=0, vmax=2,
-              origin='lower', extent=[0.5, NX + 0.5, 0.5, NY + 0.5])
-    X, Y = np.meshgrid(np.arange(1, NX + 1), np.arange(1, NY + 1))
-    ax.quiver(X, Y, ux_2d, uy_2d, color='blue', scale=None, scale_units='xy')
-    ax.set_xlim(0.5, NX + 0.5)
-    ax.set_ylim(0.5, NY + 0.5)
-    ax.set_aspect('equal')
-    ax.set_title(f"Champ de vitesse après {t_} pas de temps")
-    plt.tight_layout()
-    plt.show()
+    if plot:
+        fig, ax = plt.subplots(figsize=(7, 7))
+        ax.imshow(2 - solid_2d, cmap='gray', vmin=0, vmax=2,
+                origin='lower', extent=[0.5, NX + 0.5, 0.5, NY + 0.5])
+        X, Y = np.meshgrid(np.arange(1, NX + 1), np.arange(1, NY + 1))
+        ax.quiver(X, Y, ux_2d, uy_2d, color='blue', scale=None, scale_units='xy')
+        ax.set_xlim(0.5, NX + 0.5)
+        ax.set_ylim(0.5, NY + 0.5)
+        ax.set_aspect('equal')
+        ax.set_title(f"Champ de vitesse après {t_} pas de temps")
+        plt.tight_layout()
+        plt.show()
 
     return k
 
@@ -325,6 +327,7 @@ def LBM(filename, NX, deltaP, dx, d_equivalent):
 if __name__ == "__main__":
 
     from gen_convergence import gen_convergence_func
+    from monte_carlo import monte_carlo_func
 
     seed         = 105
     deltaP       = 0.1
@@ -332,8 +335,10 @@ if __name__ == "__main__":
     poro         = 0.9
     mean_fiber_d = 12.5
     std_d        = 2.85
-    dx           = 2e-6
+    dx           = 2e-6/4
     filename     = 'fiber_mat.tiff'
     ratio = 2
 
-    gen_convergence_func(ratio, deltaP, NX, poro, mean_fiber_d, std_d, dx, filename)
+    #gen_convergence_func(ratio, deltaP, NX, poro, mean_fiber_d, std_d, dx, filename)
+    monte_carlo_res = monte_carlo_func(deltaP)
+
