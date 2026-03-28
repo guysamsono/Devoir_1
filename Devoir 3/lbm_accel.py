@@ -326,8 +326,8 @@ def LBM(filename, NX, deltaP, dx, d_equivalent, plot=False):
 
 if __name__ == "__main__":
 
-    from gen_convergence import gen_convergence_func, gen_convergence_mean_func
-    from monte_carlo import monte_carlo_func
+    from src.gen_convergence import gen_convergence_func, gen_convergence_mean_func
+    from src.monte_carlo import monte_carlo_func
 
     seed         = 105
     deltaP       = 0.1
@@ -337,7 +337,6 @@ if __name__ == "__main__":
     std_d        = 2.85
     dx           = 2e-6
     filename     = 'fiber_mat.tiff'
-    ratio = 2
 
     nx_list = [50,75,100,150,200]
     dx_list = [4e-6,(4e-6)/1.5,2e-6,2e-6/1.5,1e-6]
@@ -346,3 +345,4 @@ if __name__ == "__main__":
     #monte_carlo_res = monte_carlo_func(deltaP)
 
     GCI, p_hat = gen_convergence_mean_func(deltaP,nx_list,dx_list,seed_list,poro,mean_fiber_d,std_d,filename)
+    plot_domain(deltaP,nx_list,dx_list,seed_list,poro,mean_fiber_d,std_d,filename)
