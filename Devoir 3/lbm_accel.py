@@ -326,8 +326,9 @@ def LBM(filename, NX, deltaP, dx, d_equivalent, plot=False):
 
 if __name__ == "__main__":
 
-    from src.gen_convergence import gen_convergence_func, gen_convergence_mean_func
+    from src.gen_convergence import gen_convergence_func, gen_convergence_mean_func, plot_domain
     from src.monte_carlo import monte_carlo_func
+    from src.experimantal import experimental
 
     seed         = 105
     deltaP       = 0.1
@@ -338,11 +339,41 @@ if __name__ == "__main__":
     dx           = 2e-6
     filename     = 'fiber_mat.tiff'
 
+    s_r_permea = 14.7
+    b_r_permea = 10.0
+
+    D = 80.6
+
     nx_list = [50,75,100,150,200]
     dx_list = [4e-6,(4e-6)/1.5,2e-6,2e-6/1.5,1e-6]
     seed_list = [1,2,8,54,23,85,100,64]
 
-    #monte_carlo_res = monte_carlo_func(deltaP)
+    # ==============================================================================
+    # Question A : incertitude numérique
+    # ==============================================================================
 
     GCI, p_hat = gen_convergence_mean_func(deltaP,nx_list,dx_list,seed_list,poro,mean_fiber_d,std_d,filename)
     plot_domain(deltaP,nx_list,dx_list,seed_list,poro,mean_fiber_d,std_d,filename)
+
+    u_num = GCI/2
+
+
+    # ==============================================================================
+    # Question B : Incertitude sur les entrées
+    # ==============================================================================
+
+    #monte_carlo_res = monte_carlo_func(deltaP)
+
+    # ==============================================================================
+    # Question C : Incertitude sur les données expérimentales
+    # ==============================================================================
+    u_d = experimental(s_r_permea, b_r_permea)   
+
+    # ==============================================================================
+    # Question D : Erreur de simulation E
+    # ==============================================================================
+
+    # ==============================================================================
+    # Question E : Erreur de modèle
+    # ==============================================================================
+
