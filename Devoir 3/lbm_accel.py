@@ -346,10 +346,7 @@ if __name__ == "__main__":
     # --- PARTIE A : Incertitude numérique (u_num) ---
     GCI, p_hat = gen_convergence_mean_func(deltaP, nx_list, dx_list, seed_list, poro, mean_fiber_d, std_d, filename)
 
-    print("\n" + "="*40)
-    print("RÉSULTATS V&V20")
-    print("="*40)
-    print(f"[Partie A] GCI : {GCI:.2f} µm²")
+    
 
     # plot_domain(deltaP,nx_list,dx_list,seed_list,poro,mean_fiber_d,std_d,filename)
 
@@ -361,6 +358,10 @@ if __name__ == "__main__":
     u_permeametre = 10.0
     u_D = experimental(u_reproductibilite, u_permeametre)
 
+    print("\n" + "="*40)
+    print("RÉSULTATS V&V20")
+    print("="*40)
+    print(f"[Partie A] GCI : {GCI:.2f} µm²")
     print(f"[Partie C] Incertitude expérimentale u_D : {u_D:.2f} µm²")
 
     # --- PARTIE D : Erreur de la simulation (E) ---
@@ -382,6 +383,9 @@ if __name__ == "__main__":
     # On calcule l'écart par rapport à la médiane (S) 
     u_input_minus = S - k_minus
     u_input_plus = k_plus - S
+
+    print(f"\n[Partie E] Incertitude numérique (u_num-) : {u_input_minus:.2f} µm²")
+    print(f"[Partie E] Incertitude numérique (u_num+) : {u_input_plus:.2f} µm²")
 
     # 2. Calcul des incertitudes de validation combinées u_val 
     u_val_minus = np.sqrt(u_num**2 + u_input_minus**2 + u_D**2)
