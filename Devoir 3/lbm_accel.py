@@ -339,6 +339,11 @@ if __name__ == "__main__":
     dx           = 2e-6
     filename     = 'fiber_mat.tiff'
 
+    s_r_permea = 14.7
+    b_r_permea = 10.0
+
+    D = 80.6
+
     nx_list = [50,75,100,150,200]
     dx_list = [4e-6,(4e-6)/1.5,2e-6,2e-6/1.5,1e-6]
     seed_list = [1,2,8,54,23,85,100,64]
