@@ -326,7 +326,7 @@ def LBM(filename, NX, deltaP, dx, d_equivalent, plot=False):
 
 if __name__ == "__main__":
 
-    from src.gen_convergence import gen_convergence_func, gen_convergence_mean_func
+    from src.gen_convergence import gen_convergence_func, gen_convergence_mean_func, plot_domain
     from src.monte_carlo import monte_carlo_func
     from src.experimental import experimental
 
@@ -345,10 +345,7 @@ if __name__ == "__main__":
 
     # --- PARTIE A : Incertitude numérique (u_num) ---
     GCI, p_hat = gen_convergence_mean_func(deltaP, nx_list, dx_list, seed_list, poro, mean_fiber_d, std_d, filename)
-
-    
-
-    # plot_domain(deltaP,nx_list,dx_list,seed_list,poro,mean_fiber_d,std_d,filename)
+    plot_domain(deltaP,nx_list,dx_list,seed_list,poro,mean_fiber_d,std_d,filename)
 
     # --- PARTIE B : Incertitude des données d'entrée (u_input) ---
     monte_carlo_res = monte_carlo_func(deltaP)
@@ -374,7 +371,7 @@ if __name__ == "__main__":
     print(f"[Partie D] Erreur de simulation E : {E:.2f} µm²")
 
     # --- PARTIE E : Erreur du modèle et validation ---
-    u_num = GCI 
+    u_num = GCI / 2
 
     # 1. Incertitudes d'entrée asymétriques (distribution log-normale)
     k_minus = monte_carlo_res["k_minus_1sigma_log"]
@@ -406,4 +403,3 @@ if __name__ == "__main__":
         print("Le modèle EST VALIDÉ ! (0 est compris dans l'intervalle)")
     else:
         print("Le modèle N'EST PAS VALIDÉ. (0 est à l'extérieur de l'intervalle)")
-        print("Piste d'amélioration à rapporter : Le modèle 2D est une simplification (les fibres ne sont pas toutes parallèles). L'erreur provient majoritairement de l'hypothèse de coupe transversale.")

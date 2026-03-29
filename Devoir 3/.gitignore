@@ -2,6 +2,7 @@
 results/*.png
 results/*.jpg
 results/*.pdf
+results/*.tiff
 
 # Ignorer les pycache
 __pycache__/
