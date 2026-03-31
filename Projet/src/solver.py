@@ -114,14 +114,14 @@ def solver_second_order(input_dict, sym_test = False):
                 A[k, k+2*nx] = -1
             
             elif sym_test and i == 0:
-                #application condition de neumman 
+                #application condition de robin
                 A[k,k] = -3
                 A[k, k+nx] = 4
                 A[k, k+2*nx] = -1
-                rhs[k] = 2*dy*q
+                rhs[k] = -2*dy*q
 
             elif i == ny-1:
-                #application condition de neumman 
+                #application condition de robin
                 A[k,k] = 3
                 A[k, k-nx] = -4
                 A[k, k-2*nx] = 1
