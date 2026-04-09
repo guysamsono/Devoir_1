@@ -9,7 +9,6 @@ from src.error import *
 
 
 
-
 def graph_error_log(input_dict: dict,
                     discretization,
                     l1_list, l2_list, linf_list,
@@ -81,9 +80,9 @@ def graph_error_log(input_dict: dict,
 
 
 
-def print_convergence_table(n_points_list, dr_list,
-                            error_list, order=2,
-                            label="L2"):
+def print_convergence_table(n_points_list, discretization_list,
+                            error_list, order,
+                            label):
     '''
     Fonction qui print une table de convergence.
     
@@ -93,7 +92,7 @@ def print_convergence_table(n_points_list, dr_list,
     :param label: label d'affichage
     '''
 
-    dr = np.array(dr_list)
+    dr = np.array(discretization_list)
     err = np.array(error_list)
 
     numerator = np.log(err[:-1] / err[1:])
@@ -108,11 +107,11 @@ def print_convergence_table(n_points_list, dr_list,
     print(header)
     print(f"{'-'*11}|{'-'*14}|{'-'*14}|{'-'*12}")
 
-    print(f"{n_points_list[0]:^10} | {dr_list[0]:^12.2e} | {error_list[0]:^12.2e} | {'-':^10}")
+    print(f"{n_points_list[0]:^10} | {discretization_list[0]:^12.2e} | {error_list[0]:^12.2e} | {'-':^10}")
 
     for i, p in enumerate(p_rates):
         n = n_points_list[i+1]
-        d = dr_list[i+1]
+        d = discretization_list[i+1]
         e = error_list[i+1]
 
         print(f"{n:^10} | {d:^12.2e} | {e:^12.2e} | {p:^10.4f}")

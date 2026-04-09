@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-def temperature_plotter(T ,input_dict, filename='temperature_field.png', sym_test=False):
+def temperature_plotter(T ,input_dict, title =None, filename='temperature_field.png', sym_test=False):
 
     b = input_dict['b']
     c = input_dict['c']
@@ -24,7 +24,7 @@ def temperature_plotter(T ,input_dict, filename='temperature_field.png', sym_tes
     plt.colorbar(label='Temperature')
     plt.xlabel('x')
     plt.ylabel('y')
-    plt.title('Temperature distribution')
+    plt.title(title if title else 'Temperature distribution')
     
     file_path = os.path.join('results', filename)
 

@@ -1,3 +1,6 @@
+from src.solver import solver_first_order,mms_Temperature
+from src.error import norm_l1, norm_l2, norm_infinity
+from src.convergence import graph_error_log, print_convergence_table
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -64,23 +67,23 @@ def generer_mms_simple(input_dict: dict, afficher_graphiques: bool = False, save
     T_inf_top = sp.simplify(T_top + (kappa / h) * dT_dy_top)
 
 
-    # Affichage des dérivées
-    print("Dérivée première en x:")
-    print(T_x)
-    print("Dérivée seconde en x:")
-    print(T_xx)
-    print("Dérivée première en y:")
-    print(T_y)
-    print("Dérivée seconde en y:")
-    print(T_yy)
-    print("Terme source :")
-    print(source)
-    print("\nCondition frontière gamma_2 :")
-    print(T_boundary_2)
-    print("\nCondition frontière gamma_3 :")
-    print(dT_dy_boundary_3)
-    print("\nCondition frontière gamma_4 :")
-    print(T_boundary_4)
+    # # Affichage des dérivées
+    # print("Dérivée première en x:")
+    # print(T_x)
+    # print("Dérivée seconde en x:")
+    # print(T_xx)
+    # print("Dérivée première en y:")
+    # print(T_y)
+    # print("Dérivée seconde en y:")
+    # print(T_yy)
+    # print("Terme source :")
+    # print(source)
+    # print("\nCondition frontière gamma_2 :")
+    # print(T_boundary_2)
+    # print("\nCondition frontière gamma_3 :")
+    # print(dT_dy_boundary_3)
+    # print("\nCondition frontière gamma_4 :")
+    # print(T_boundary_4)
 
     # Conversion en fonctions Python
     f_T_MMS = sp.lambdify([x, y], T_MMS, "numpy")
@@ -131,3 +134,71 @@ def generer_mms_simple(input_dict: dict, afficher_graphiques: bool = False, save
     return f_T_MMS, f_source, f_bc_left, f_bc_right, f_bc_bottom, f_tinf_top
 
 
+def mms_convergence_analysis(input_dict: dict):
+
+    nx_list = [100,200,500,750]
+    ny_list = [100,200,500,750]
+    dx_list = [input_dict['b']/(nx-1) for nx in nx_list]
+    dy_list = [input_dict['c']/(ny-1) for ny in ny_list]
+
+    l1_list_x = []
+    l2_list_x = []
+    linf_list_x = []
+    l1_list_y = []
+    l2_list_y = []
+    linf_list_y = []
+
+
+
+    for nx in nx_list:
+        input_dict['nx'] = nx
+        input_dict['ny'] = 500
+
+        f_T_MMS, f_source, f_bc_left, f_bc_right, f_bc_bottom, f_tinf_top = generer_mms_simple(input_dict, afficher_graphiques=False)
+
+        temperature_sim = solver_first_order(input_dict, sym_test = False, source_mms = f_source, 
+                                         bc_left=f_bc_left, bc_right=f_bc_right, bc_bottom=f_bc_bottom, bc_top_tinf=f_tinf_top)
+        
+        temperature_mms = mms_Temperature(input_dict, f_T_MMS)
+        
+
+        l1_list_x.append(norm_l1(temperature_sim, temperature_mms))
+        l2_list_x.append(norm_l2(temperature_sim, temperature_mms))
+        linf_list_x.append(norm_infinity(temperature_sim, temperature_mms))
+
+    for ny in ny_list:
+
+        input_dict['nx'] = 500
+        input_dict['ny'] = ny
+
+        f_T_MMS, f_source, f_bc_left, f_bc_right, f_bc_bottom, f_tinf_top = generer_mms_simple(input_dict, afficher_graphiques=False)
+
+        temperature_sim = solver_first_order(input_dict, sym_test = False, source_mms = f_source, 
+                                         bc_left=f_bc_left, bc_right=f_bc_right, bc_bottom=f_bc_bottom, bc_top_tinf=f_tinf_top)
+        
+        temperature_mms = mms_Temperature(input_dict, f_T_MMS)
+
+        l1_list_y.append(norm_l1(temperature_sim, temperature_mms))
+        l2_list_y.append(norm_l2(temperature_sim, temperature_mms))
+        linf_list_y.append(norm_infinity(temperature_sim, temperature_mms))
+
+    graph_error_log(input_dict,dx_list, l1_list_x, l2_list_x, linf_list_x,1,  
+                    'x',
+                    save_path="results/convergence_x.png",
+                    show_fig=True,
+                    xlabel=r"Taille de maille")
+    
+    graph_error_log(input_dict,dy_list, l1_list_y, l2_list_y, linf_list_y,1,  
+                    'y',
+                    save_path="results/convergence_y.png",
+                    show_fig=True,
+                    xlabel=r"Taille de maille")
+    
+    print_convergence_table(nx_list, dx_list, l1_list_x, 1, "L1 en x")
+    print_convergence_table(nx_list, dx_list, l2_list_x, 1, "L2 en x")
+    print_convergence_table(nx_list, dx_list, linf_list_x, 1, "Linf en x")
+    print_convergence_table(ny_list, dy_list, l1_list_y, 1, "L1 en y")
+    print_convergence_table(ny_list, dy_list, l2_list_y, 1, "L2 en y")
+    print_convergence_table(ny_list, dy_list, linf_list_y, 1, "Linf en y")
+
+    return
