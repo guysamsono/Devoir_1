@@ -6,24 +6,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sympy as sp
 
-def calcul_ordre_convergence_richardson(srq_list,maille_list, p_init=2.0, tol=1e-10, max_iter=1000):
+def calcul_ordre_convergence_richardson(srq_list, maille_list, p_init=2.0, tol=1e-10, max_iter=1000):
     """
     Calcule l'ordre de convergence observé p avec la méthode itérative de Roache.
 
     Paramètres
     ----------
-    f1 : float
-        Solution sur le maillage le plus fin.
-    f2 : float
-        Solution sur le maillage intermédiaire.
-    f3 : float
-        Solution sur le maillage le plus grossier.
-    r12 : float
-        Ratio de raffinement entre les maillages 1 et 2.
-        En général r12 = h2 / h1.
-    r23 : float
-        Ratio de raffinement entre les maillages 2 et 3.
-        En général r23 = h3 / h2.
+    srq_list : list[float]
+        Valeurs de la quantité d'intérêt sur différents maillages.
+    maille_list : list[int]
+        Nombre de points dans chaque direction pour chaque maillage.
     p_init : float, optionnel
         Estimation initiale de p.
     tol : float, optionnel
@@ -37,33 +29,48 @@ def calcul_ordre_convergence_richardson(srq_list,maille_list, p_init=2.0, tol=1e
         Ordre de convergence observé.
     """
 
-    f1 = srq_list[-1]
+    f1 = srq_list[-1]   # maillage le plus fin
     f2 = srq_list[-2]
     f3 = srq_list[-3]
-    r12 = maille_list[-1]/maille_list[-2]
-    r23 = maille_list[-2]/maille_list[-3]
+
+    n1 = maille_list[-1]
+    n2 = maille_list[-2]
+    n3 = maille_list[-3]
+
+    # Tailles de maille h ~ 1/(n-1)
+    h1 = 1.0 / (n1 - 1)
+    h2 = 1.0 / (n2 - 1)
+    h3 = 1.0 / (n3 - 1)
+
+    r12 = h2 / h1
+    r23 = h3 / h2
+
+    e32 = f3 - f2
+    e21 = f2 - f1
 
     print("f3, f2, f1 =", f3, f2, f1)
-    print("e32 =", f3 - f2)
-    print("e21 =", f2 - f1)
-    print("ratio e32/e21 =", (f3 - f2)/(f2 - f1))
+    print("h3, h2, h1 =", h3, h2, h1)
+    print("r12 =", r12)
+    print("r23 =", r23)
+    print("e32 =", e32)
+    print("e21 =", e21)
+    print("ratio e32/e21 =", e32 / e21)
 
-    if f2 == f1:
-        raise ValueError("f2 - f1 = 0, impossible de calculer l'ordre.")
+    if abs(e21) < 1e-14:
+        raise ValueError("f2 - f1 est trop proche de 0, impossible de calculer l'ordre.")
     if r12 <= 0 or r23 <= 0:
         raise ValueError("r12 et r23 doivent être strictement positifs.")
-    if r12 == 1 or r23 == 1:
+    if abs(r12 - 1.0) < 1e-14 or abs(r23 - 1.0) < 1e-14:
         raise ValueError("r12 et r23 ne doivent pas être égaux à 1.")
 
     p = p_init
 
     for _ in range(max_iter):
-        arg = ((r12**p - 1.0) * (f3 - f2) / (f2 - f1)) + r12**p
+        arg = ((r12**p - 1.0) * (e32 / e21)) + r12**p
 
         if arg <= 0:
             raise ValueError(
-                "Argument du logarithme <= 0. Vérifie l'ordre des maillages, "
-                "les ratios r12/r23, ou les valeurs f1, f2, f3."
+                "Argument du logarithme <= 0. Vérifie les maillages ou les valeurs de la SRQ."
             )
 
         p_new = np.log(arg) / np.log(r12 * r23)
@@ -72,8 +79,6 @@ def calcul_ordre_convergence_richardson(srq_list,maille_list, p_init=2.0, tol=1e
             return p_new
 
         p = p_new
-
-    
 
     raise RuntimeError("La méthode itérative n'a pas convergé.")
 
@@ -165,7 +170,7 @@ def plot_relative_error_loglog(srq_list, maille_list, title="Erreur relative sur
 
 
 def solution_verification(input_dict,order=2):
-    maille_list = [100,200,400,600,700,750,800,850]
+    maille_list = [100,200,400,600]
 
     srq_list = []
 
@@ -176,20 +181,19 @@ def solution_verification(input_dict,order=2):
         if order == 1:
             temperature = solver_first_order(input_dict)
             heat_transfer = compute_boundary_fluxes(temperature,input_dict)
-            srq_list.append(heat_transfer)
+            srq_list.append(np.max(temperature))
 
         elif order == 2:
             temperature = solver_second_order(input_dict)
             heat_transfer = compute_boundary_fluxes(temperature,input_dict)
-            srq_list.append(heat_transfer)
+            srq_list.append(np.max(temperature))
 
     p_hat_rich = calcul_ordre_convergence_richardson(srq_list, maille_list, p_init=order)
 
     p_hat = calcul_p_hat(srq_list,2)
 
     print(p_hat_rich)
-    print(p_hat)
-
+    
     plot_relative_error_loglog(srq_list, maille_list)
 
     return p_hat
