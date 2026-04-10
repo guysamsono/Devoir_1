@@ -1,6 +1,7 @@
 from src.solver import *
 from src.error import norm_l1, norm_l2, norm_infinity
 from src.convergence import graph_error_log, print_convergence_table
+from src.mms import *
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -196,4 +197,31 @@ def solution_verification(input_dict,order=2):
     
     plot_relative_error_loglog(srq_list, maille_list)
 
-    return p_hat
+
+
+def post_processing_verification(input_dict):
+    maille_list = [100,200,400,500,600,700,800,900,1000]
+
+    f_T_MMS, f_source, f_bc_left, f_bc_right, f_bc_bottom, f_tinf_top = generer_mms_simple(input_dict, afficher_graphiques=False)
+
+    srq_list = []
+
+    for n in maille_list:
+        input_dict['nx'] = n
+        input_dict['ny'] = n
+
+        temperature_exact = mms_Temperature(input_dict, f_T_MMS)
+        heat_transfer = compute_boundary_fluxes(temperature_exact,input_dict)
+
+        srq_list.append(heat_transfer)
+
+    p_hat_rich = calcul_ordre_convergence_richardson(srq_list, maille_list, p_init=2)
+
+    p_hat = calcul_p_hat(srq_list,2)
+
+    print(p_hat_rich)
+    print(p_hat)
+    
+    plot_relative_error_loglog(srq_list, maille_list)
+
+    

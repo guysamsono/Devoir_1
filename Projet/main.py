@@ -5,13 +5,13 @@ from src.symmetry import test_symmetrie
 from src.mms import generer_mms_simple, mms_convergence_analysis
 from src.error import *
 from src.convergence import*
-from src.solution_verification import solution_verification 
+from src.solution_verification import solution_verification, post_processing_verification
 
 if __name__ == "__main__": 
 
     input_dict = gen_input()
 
-    type_simul = 'solution_verification'   #type de simulation à réaliser : 'symmetry_test' ou 'temperature' ou 'temperature_mms ou solution_verification'
+    type_simul = 'post_processing_verification'   #type de simulation à réaliser : 'symmetry_test' ou 'temperature' ou 'temperature_mms ou solution_verification'
     order = '2'                            #ordre de la simulation : '1' pour ordre 1 et '2' pour ordre 2     
 
     if type_simul == 'symmetry_test':
@@ -38,4 +38,8 @@ if __name__ == "__main__":
     if type_simul == 'solution_verification':
 
         solution_verification(input_dict,2)
+
+    if type_simul == 'post_processing_verification':
+        
+        post_processing_verification(input_dict)
 
