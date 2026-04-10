@@ -5,7 +5,6 @@ from scipy.sparse.linalg import spsolve
 def speed_function(c,d, y):
 
     speed = (3*d)/(4*c)*(1 - (y/c)**2)
-
     return speed 
 
 def compute_conservation_of_energy(T, input_dict):
@@ -49,6 +48,28 @@ def compute_conservation_of_energy(T, input_dict):
     total_flux_conservation -= f * b * c
 
     return total_flux_conservation
+
+def compute_boundary_fluxes(T, input_dict):
+    ny = input_dict['ny']
+    nx = input_dict['nx']
+    kappa = input_dict['k']
+    b = input_dict['b']
+    c = input_dict['c']
+
+    T = np.asarray(T).reshape((ny, nx))
+
+    dx = b / (nx - 1)
+    dy = c / (ny - 1)
+
+    heat_transfer = 0.0
+
+    for i in range(nx):
+        dTdy_top = (3*T[-1, i] - 4*T[-2, i] + T[-3, i]) / (2*dy)
+        outward_diff = -kappa * dTdy_top * dx
+        heat_transfer += outward_diff
+
+    return 2 * heat_transfer
+
 
 def solver_first_order(input_dict, sym_test = False, source_mms = None,
                        bc_left=None, bc_right=None, bc_bottom=None, bc_top_tinf=None ):
