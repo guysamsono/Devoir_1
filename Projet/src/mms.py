@@ -1,4 +1,4 @@
-from src.solver import solver_first_order,mms_Temperature
+from src.solver import *
 from src.error import norm_l1, norm_l2, norm_infinity
 from src.convergence import graph_error_log, print_convergence_table
 import os
@@ -134,7 +134,7 @@ def generer_mms_simple(input_dict: dict, afficher_graphiques: bool = False, save
     return f_T_MMS, f_source, f_bc_left, f_bc_right, f_bc_bottom, f_tinf_top
 
 
-def mms_convergence_analysis(input_dict: dict):
+def mms_convergence_analysis(input_dict: dict, order):
 
     maille_list = [100,200,500,750]
     discretization_list = [input_dict['b']/(nx-1) for nx in maille_list]
@@ -148,9 +148,15 @@ def mms_convergence_analysis(input_dict: dict):
         input_dict['ny'] = n
 
         f_T_MMS, f_source, f_bc_left, f_bc_right, f_bc_bottom, f_tinf_top = generer_mms_simple(input_dict, afficher_graphiques=False)
-
-        temperature_sim = solver_first_order(input_dict, sym_test = False, source_mms = f_source, 
+        
+        if order == '1':
+            temperature_sim = solver_first_order(input_dict, sym_test = False, source_mms = f_source, 
+                                         bc_left=f_bc_left, bc_right=f_bc_right, bc_bottom=f_bc_bottom, bc_top_tinf=f_tinf_top) 
+        
+        else: 
+            temperature_sim = solver_second_order(input_dict, sym_test = False, source_mms = f_source, 
                                          bc_left=f_bc_left, bc_right=f_bc_right, bc_bottom=f_bc_bottom, bc_top_tinf=f_tinf_top)
+
         
         temperature_mms = mms_Temperature(input_dict, f_T_MMS)
         
@@ -161,12 +167,12 @@ def mms_convergence_analysis(input_dict: dict):
 
     graph_error_log(input_dict,discretization_list, l1_list_x, l2_list_x, linf_list_x,1,  
                     'x',
-                    save_path="results/convergence_x.png",
+                    save_path=f"results/convergence_x_order_{order}.png",
                     show_fig=True,
                     xlabel=r"Taille de maille")
     
-    print_convergence_table(maille_list, discretization_list, l1_list_x, 1, "L1 en x")
-    print_convergence_table(maille_list, discretization_list, l2_list_x, 1, "L2 en x")
-    print_convergence_table(maille_list, discretization_list, linf_list_x, 1, "Linf en x")
+    print_convergence_table(maille_list, discretization_list, l1_list_x, str(order), f"L1 en x pour l'ordre")
+    print_convergence_table(maille_list, discretization_list, l2_list_x, str(order), f"L2 en x pour l'ordre")
+    print_convergence_table(maille_list, discretization_list, linf_list_x, str(order), f"Linf en x pour l'ordre")
 
     return

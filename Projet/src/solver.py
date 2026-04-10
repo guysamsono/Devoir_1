@@ -228,9 +228,9 @@ def solver_second_order(input_dict, sym_test = False, source_mms = None,
             else:
                 #noeud intérieur
                 u = speed_function(c, d, y[i])
-                A[k, k-1] = (rho*cp*u/dx + kappa/dx**2)
-                A[k, k] = (-rho*cp*u/dx - 2*kappa/dx**2 - 2*kappa/dy**2)
-                A[k, k+1] = kappa/dx**2
+                A[k, k-1] = (rho*cp*u/(2*dx) + kappa/dx**2)
+                A[k, k] = (-2*kappa/dx**2 - 2*kappa/dy**2)
+                A[k, k+1] = kappa/dx**2 - rho*cp*u/(2*dx)
                 A[k, k-nx] = kappa/dy**2
                 A[k, k+nx] = kappa/dy**2 
                 if source_mms is None:

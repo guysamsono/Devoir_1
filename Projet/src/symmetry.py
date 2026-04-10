@@ -52,4 +52,5 @@ def test_symmetrie(order, input_dict):
     
     y2 = np.linspace(-input_dict['c'], input_dict['c'], 2*ny)
     one_dimension_plotter(y2, t_sym_reshaped[:, j_mid], plot_dict, last_graph=True, color='green', filename='symmetry_1d_full.png')
+    
     return

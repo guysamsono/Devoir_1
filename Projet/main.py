@@ -11,7 +11,7 @@ if __name__ == "__main__":
     input_dict = gen_input()
 
     type_simul = 'temperature_mms'        #type de simulation à réaliser : 'symmetry_test' ou 'temperature' ou 'temperature_mms'
-    order = '1'                         #ordre de la simulation : '1' pour ordre 1 et '2' pour ordre 2     
+    order = '2'                         #ordre de la simulation : '1' pour ordre 1 et '2' pour ordre 2     
 
     if type_simul == 'symmetry_test':
         print('Test de symétrie en cours...')
@@ -32,10 +32,5 @@ if __name__ == "__main__":
 
     if type_simul == 'temperature_mms':
 
-        f_T_MMS, f_source, f_bc_left, f_bc_right, f_bc_bottom, f_tinf_top = generer_mms_simple(input_dict, afficher_graphiques=True)
-
-        temperature = solver_first_order(input_dict, sym_test = False, source_mms = f_source, 
-                                         bc_left=f_bc_left, bc_right=f_bc_right, bc_bottom=f_bc_bottom, bc_top_tinf=f_tinf_top)
-
-        mms_convergence_analysis(input_dict)
+        mms_convergence_analysis(input_dict, order)
 
