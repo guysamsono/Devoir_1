@@ -21,7 +21,7 @@ if __name__ == "__main__":
     SIMUL_TYPE = 'solution_verification'         #type de simulation à réaliser :
                                            # 'symmetry_test' ou 'temperature' ou 'temperature_mms'
                                            # ou 'solution_verification' ou 'full_simulation'
-    ORDER = '1'                            #ordre de la simulation : '1' ou '2'
+    ORDER = '2'                            #ordre de la simulation : '1' ou '2'
 
     if SIMUL_TYPE == 'symmetry_test':
         print('Test de symétrie en cours...')
