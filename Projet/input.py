@@ -8,8 +8,8 @@ def gen_input():
         'b':20,             #longueur du domaine (x)
         'c':4,              #demi-largeur du domaine (y)  
         'd':10,             #débit par unité de longueur (m^2/s) 
-        'nx':500,           #nombre de points de discrétisation en x
-        'ny':500,           #nombre de points de discrétisation en y
+        'nx':250,           #nombre de points de discrétisation en x
+        'ny':250,           #nombre de points de discrétisation en y
         'rho':1,            #densité
         'cp':1,             #chaleur spécifique
         'k':1,              #conductivité thermique

@@ -25,7 +25,7 @@ if __name__ == "__main__":
             srq = compute_conservation_of_energy(temperature, input_dict)
             print(f"Résidu de la conservation de l'énergie : {srq}")
         else:
-            temperature = solver_second_order(input_dict)
+            temperature = solver_second_order(input_dict,'upwind')
             srq = compute_conservation_of_energy(temperature, input_dict)
             print(f"Résidu de la conservation de l'énergie : {srq}")
         
