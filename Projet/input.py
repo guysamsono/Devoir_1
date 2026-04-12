@@ -2,15 +2,15 @@ import datetime
 import os
 
 def gen_input():
-    
+
     '''
     Génère un dictionnaire d'entrée pour les fonctions de résolution et de test.
     return: input_dict (dictionnaire contenant les paramètres du problème)
     '''
-    input_dict = {           
+    input_dict = {
         'b':20,             #longueur du domaine (x)
-        'c':4,              #demi-largeur du domaine (y)  
-        'd':1,             #débit par unité de longueur (m^2/s) 
+        'c':4,              #demi-largeur du domaine (y)
+        'd':1,             #débit par unité de longueur (m^2/s)
         'nx':25,           #nombre de points de discrétisation en x
         'ny':25,           #nombre de points de discrétisation en y
         'rho':1,            #densité
