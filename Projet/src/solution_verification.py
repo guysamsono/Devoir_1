@@ -4,19 +4,14 @@ Module de vérification de solution.
 Contient les fonctions pour évaluer l'ordre de convergence observé
 via la méthode itérative de rich et l'extrapolation de Richardson.
 """
-
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-
-# Imports explicites (élimine les Wildcard imports et les Undefined variables)
 from src.solver import (
     solver_first_order,
     solver_second_order,
-    compute_boundary_fluxes
-)
+    compute_boundary_fluxes)
 from src.mms import generer_mms_simple, mms_Temperature
-
 
 def calcul_ordre_convergence_richardson(srq_list, maille_list, p_init=2.0, tol=1e-10, max_iter=1000):
     """
@@ -159,6 +154,10 @@ def solution_verification(input_dict, order=2, scheme='central'):
     sur une liste de maillages prédéfinie.
     """
     # pylint: disable=too-many-locals
+
+    sol_verif_dir = os.path.join(input_dict['save_path'], 'SOLUTION_VERIFICATION')
+    os.makedirs(sol_verif_dir, exist_ok=True)
+
     maille_list = [51, 101, 201, 401, 801]
     local_dict = input_dict.copy()
 
@@ -210,22 +209,22 @@ def solution_verification(input_dict, order=2, scheme='central'):
     plot_relative_error_loglog(
         srq_list_temp_centrale, maille_list, input_dict,
         title="Erreur relative sur la température centrale (%)",
-        filename="srq_convergence_temp_centrale.png"
+        filename="SOLUTION_VERIFICATION/srq_convergence_temp_centrale.png"
     )
     plot_relative_error_loglog(
         srq_list_temp_max, maille_list, input_dict,
         title="Erreur relative sur la température maximale (%)",
-        filename="srq_convergence_temp_max.png"
+        filename="SOLUTION_VERIFICATION/srq_convergence_temp_max.png"
     )
     plot_relative_error_loglog(
         srq_list_heat_full, maille_list, input_dict,
         title="Erreur relative sur le transfert de chaleur total (%)",
-        filename="srq_convergence_heat_full.png"
+        filename="SOLUTION_VERIFICATION/srq_convergence_heat_full.png"
     )
     plot_relative_error_loglog(
         srq_list_heat_40, maille_list, input_dict,
         title="Erreur relative sur le transfert de chaleur partiel (%)",
-        filename="srq_convergence_heat_center.png"
+        filename="SOLUTION_VERIFICATION/srq_convergence_heat_center.png"
     )
 
 
@@ -233,6 +232,9 @@ def post_processing_verification(input_dict):
     """
     Effectue une passe de post-traitement sur de gros maillages pour la MMS.
     """
+    post_proc_dir = os.path.join(input_dict['save_path'], 'POST_PROCESSING')
+    os.makedirs(post_proc_dir, exist_ok=True)
+
     maille_list = [100, 200, 400, 800, 1600]
     local_dict = input_dict.copy()
 
@@ -255,4 +257,7 @@ def post_processing_verification(input_dict):
     print(f"Ordre post-processing rich: {p_hat_rich}")
     print(f"Ordre post-processing simple: {p_hat}")
 
-    plot_relative_error_loglog(srq_list, maille_list, input_dict, filename="post_processing_verification.png")
+    plot_relative_error_loglog(
+        srq_list, maille_list, input_dict,
+        filename="POST_PROCESSING/post_processing_verification.png"
+    )

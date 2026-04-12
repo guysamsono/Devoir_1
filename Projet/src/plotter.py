@@ -8,7 +8,6 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 
-
 def temperature_plotter(
         t_array, input_dict, title=None,
         filename='temperature_field.png', sym_test=False):

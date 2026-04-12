@@ -7,9 +7,10 @@ Vérification et Validation (V&V) à travers plusieurs modes d'exécution.
 """
 from input import gen_input
 from src.plotter import temperature_plotter
-from src.solver import (solver_first_order, solver_second_order,
-                        compute_conservation_of_energy,
-                        save_as_csv, save_input_as_csv)
+from src.solver import (
+    solver_first_order, solver_second_order,
+    compute_conservation_of_energy,
+    save_as_csv, save_input_as_csv)
 from src.symmetry import test_symmetrie
 from src.mms import mms_convergence_analysis
 from src.solution_verification import solution_verification, post_processing_verification
@@ -24,7 +25,7 @@ if __name__ == "__main__":
 
     if SIMUL_TYPE == 'symmetry_test':
         print('Test de symétrie en cours...')
-        test_symmetrie(ORDER, input_dict,scheme='upwind')
+        test_symmetrie(ORDER, input_dict, scheme='upwind')
 
     if SIMUL_TYPE == 'temperature':
         print(f'Simulation de température en cours à ordre {ORDER}...')
