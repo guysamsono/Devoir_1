@@ -62,15 +62,16 @@ def compute_conservation_of_energy(T, input_dict):
 
 
 
-def compute_boundary_fluxes(T, input_dict):
-    
+def compute_boundary_fluxes(T, input_dict, margin_ratio=0.2):
     '''
-    Calcule le flux de chaleur à travers la frontière supérieure du domaine.
+    Calcule le flux de chaleur à travers la frontière supérieure du domaine,
+    en excluant les coins pour éviter les singularités.
     
     param T: tableau 1D de la température à chaque point du maillage (taille nx*ny)
-    param input_dict: dictionnaire contenant les paramètres du problème (doit inclure 'nx', 'ny', 'k', 'b', 'c')
+    param input_dict: dictionnaire contenant les paramètres du problème
+    param margin_ratio: fraction du domaine à ignorer de chaque côté (ex: 0.2 = on ignore 20% à gauche et 20% à droite)
 
-    return: flux de chaleur à travers la frontière supérieure (float)
+    return: flux de chaleur à travers la section centrale de la frontière supérieure (float)
     '''
     ny = input_dict['ny']
     nx = input_dict['nx']
@@ -89,9 +90,17 @@ def compute_boundary_fluxes(T, input_dict):
         dTdy_top = (3*T[-1, i] - 4*T[-2, i] + T[-3, i]) / (2*dy)
         flux_top[i] = -kappa * dTdy_top
 
-    heat_transfer = np.trapz(flux_top, dx=dx)
+    x_start = b * margin_ratio          
+    x_end = b * (1 - margin_ratio)      
 
-    return 2*heat_transfer
+    i_start = int(round(x_start / dx))
+    i_end = int(round(x_end / dx))
+
+    flux_top_center = flux_top[i_start : i_end + 1]
+
+    heat_transfer = np.trapezoid(flux_top_center, dx=dx)
+
+    return 2 * heat_transfer
 
 
 def solver_first_order(input_dict, sym_test = False, source_mms = None,

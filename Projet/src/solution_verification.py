@@ -170,25 +170,25 @@ def plot_relative_error_loglog(srq_list, maille_list, title="Erreur relative sur
     return slope, intercept, C, r2
 
 
-def solution_verification(input_dict,order=2):
+def solution_verification(input_dict, order=2, scheme='central'):
     maille_list = [51, 101, 201, 401, 801]
-
+    local_dict = input_dict.copy()
     srq_list = []
 
     for n in maille_list:
-        input_dict['nx'] = n
-        input_dict['ny'] = n
+        local_dict['nx'] = n
+        local_dict['ny'] = n
 
         if order == 1:
-            temperature = solver_first_order(input_dict)
-            heat_transfer = compute_boundary_fluxes(temperature,input_dict)
-            energy_conservation = compute_conservation_of_energy(temperature, input_dict)
+            temperature = solver_first_order(local_dict)
+            heat_transfer = compute_boundary_fluxes(temperature,local_dict)
+            energy_conservation = compute_conservation_of_energy(temperature, local_dict)
             srq_list.append((energy_conservation))
 
         elif order == 2:
-            temperature = solver_second_order(input_dict)
-            heat_transfer = compute_boundary_fluxes(temperature, input_dict, margin_ratio=0.4)
-            energy_conservation = compute_conservation_of_energy(temperature, input_dict)
+            temperature = solver_second_order(local_dict, scheme)
+            heat_transfer = compute_boundary_fluxes(temperature, local_dict, margin_ratio=0.4)
+            energy_conservation = compute_conservation_of_energy(temperature, local_dict)
 
             # Mid Temp SRQ
             # i_mid = input_dict['ny'] // 2
@@ -212,17 +212,17 @@ def solution_verification(input_dict,order=2):
 
 def post_processing_verification(input_dict):
     maille_list = [100,200,400,500,600,700,800,900,1000]
-
-    f_T_MMS, f_source, f_bc_left, f_bc_right, f_bc_bottom, f_tinf_top = generer_mms_simple(input_dict, afficher_graphiques=False)
+    local_dict = input_dict.copy()
+    f_T_MMS, f_source, f_bc_left, f_bc_right, f_bc_bottom, f_tinf_top = generer_mms_simple(local_dict, afficher_graphiques=False)
 
     srq_list = []
 
     for n in maille_list:
-        input_dict['nx'] = n
-        input_dict['ny'] = n
+        local_dict['nx'] = n
+        local_dict['ny'] = n
 
-        temperature_exact = mms_Temperature(input_dict, f_T_MMS)
-        heat_transfer = compute_boundary_fluxes(temperature_exact,input_dict)
+        temperature_exact = mms_Temperature(local_dict, f_T_MMS)
+        heat_transfer = compute_boundary_fluxes(temperature_exact,local_dict)
         # energy_conservation = compute_conservation_of_energy(temperature_exact,input_dict,f_source=f_source,
         #                                                       bc_top_tinf=f_tinf_top,bc_bottom=f_bc_bottom,order=2)
 

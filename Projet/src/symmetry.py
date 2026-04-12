@@ -30,33 +30,34 @@ def test_symmetrie(order, input_dict, scheme):
             filename='normal_domain_test_second_order.png'
         )
 
-    ny0 = input_dict['ny']
-    input_dict['ny'] = 2 * ny0
+    sym_input_dict = input_dict.copy()
+    sym_input_dict['ny'] = 2 * input_dict['ny']
 
     if order == '1':
-        t_sym = solver_first_order(input_dict, True)
+        t_sym = solver_first_order(sym_input_dict, True)
         temperature_plotter(
             t_sym,
-            input_dict,
+            sym_input_dict,
             title='Champ de température - domaine symétrisé - ordre 1',
             filename='symmetrised_domain_test_first_order.png',
             sym_test=True
         )
     else:
-        t_sym = solver_second_order(input_dict, scheme, True)
+        t_sym = solver_second_order(sym_input_dict, scheme, True)
         temperature_plotter(
             t_sym,
-            input_dict,
+            sym_input_dict,
             title=f'Champ de température - domaine symétrisé - ordre 2 ({scheme})',
             filename='symmetrised_domain_test_second_order.png',
             sym_test=True
         )
 
-    error = t_normal_order - t_sym[ny0 * input_dict['nx'] : 2 * ny0 * input_dict['nx']]
+    nx = input_dict['nx']
+    ny = input_dict['ny']
+
+    error = t_normal_order - t_sym[ny * nx : 2 * ny * nx]
     l2_norm = np.linalg.norm(error)
     print(f"norme L2 de l'erreur sur le domaine symétrisé: {l2_norm}")
-
-    input_dict['ny'] = ny0
 
     error_plotter(error, input_dict, 'symetry_error_field.png')
 
@@ -67,11 +68,8 @@ def test_symmetrie(order, input_dict, scheme):
         'label': 'Temperature on half domain'
     }
 
-    nx = input_dict['nx']
-    ny = input_dict['ny']
-
     t_normal_order_reshaped = t_normal_order.reshape((ny, nx))
-    t_sym_reshaped = t_sym.reshape((2 * ny0, nx))
+    t_sym_reshaped = t_sym.reshape((sym_input_dict['ny'], nx))
     y = np.linspace(0, input_dict['c'], ny)
     j_mid = nx // 2
 
@@ -87,14 +85,14 @@ def test_symmetrie(order, input_dict, scheme):
     plot_dict['label'] = 'Temperature on symmetrised domain'
     one_dimension_plotter(
         y,
-        np.flip(t_sym_reshaped[:ny0, j_mid]),
+        np.flip(t_sym_reshaped[:ny, j_mid]),
         plot_dict,
         last_graph=True,
         color='red',
         filename='symmetry_1d.png'
     )
     
-    y2 = np.linspace(-input_dict['c'], input_dict['c'], 2 * ny)
+    y2 = np.linspace(-input_dict['c'], input_dict['c'], sym_input_dict['ny'])
     one_dimension_plotter(
         y2,
         t_sym_reshaped[:, j_mid],

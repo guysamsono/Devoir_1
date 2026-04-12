@@ -11,7 +11,7 @@ if __name__ == "__main__":
 
     input_dict = gen_input()
 
-    type_simul = 'symmetry_test'   #type de simulation à réaliser : 'symmetry_test' ou 'temperature' ou 'temperature_mms ou solution_verification'
+    type_simul = 'full_simulation'   #type de simulation à réaliser : 'symmetry_test' ou 'temperature' ou 'temperature_mms' ou 'solution_verification' ou 'full_simulation'
     order = '2'                            #ordre de la simulation : '1' pour ordre 1 et '2' pour ordre 2     
 
     if type_simul == 'symmetry_test':
@@ -47,3 +47,41 @@ if __name__ == "__main__":
         
         post_processing_verification(input_dict)
 
+    if type_simul == 'full_simulation':
+        print('\n' + '='*60)
+        print(f'LANCEMENT DE LA SIMULATION COMPLÈTE (Ordre {order})')
+        print('='*60 + '\n')
+
+        print('--- ÉTAPE 1 : Test de symétrie ---')
+        test_symmetrie(order, input_dict, scheme='upwind')
+        print('Test de symétrie terminé.\n')
+
+        print('--- ÉTAPE 2 : Calcul de la température et conservation de l\'énergie---')
+        if order == '1':
+            temperature = solver_first_order(input_dict)
+        else:
+            temperature = solver_second_order(input_dict, scheme='upwind')
+        
+        srq = compute_conservation_of_energy(temperature, input_dict)
+        print(f"Résidu de la conservation de l'énergie : {srq}")
+        
+        temperature_plotter(temperature, input_dict)
+        save_as_csv(temperature, input_dict, f"results/temperature_order_{order}.csv")
+        save_input_as_csv(input_dict, f"results/input_parameters_order_{order}.csv")
+        print('Calcul de la température terminé.\n')
+
+        print('--- ÉTAPE 3 : Vérification de code (MMS) ---')
+        mms_convergence_analysis(input_dict, order, scheme='central')
+        print('Vérification de code terminée.\n')
+
+        print('--- ÉTAPE 4 : Vérification de solution ---')
+        solution_verification(input_dict, int(order), scheme='upwind') 
+        print('Vérification de solution terminée.\n')
+
+        print('--- ÉTAPE 5 : Post-processing final ---')
+        post_processing_verification(input_dict)
+        print('Post-processing terminé.\n')
+
+        print('='*60)
+        print('SIMULATION COMPLÈTE TERMINÉE AVEC SUCCÈS')
+        print('='*60 + '\n')

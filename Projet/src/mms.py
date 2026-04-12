@@ -136,36 +136,38 @@ def generer_mms_simple(input_dict: dict, afficher_graphiques: bool = False, save
 
 def mms_convergence_analysis(input_dict: dict, order,scheme='central'):
 
+    local_dict = input_dict.copy()
+
     maille_list = [100,200,300]
-    discretization_list = [input_dict['b']/(nx-1) for nx in maille_list]
+    discretization_list = [local_dict['b']/(nx-1) for nx in maille_list]
 
     l1_list_x = []
     l2_list_x = []
     linf_list_x = []
 
     for n in maille_list:
-        input_dict['nx'] = n
-        input_dict['ny'] = n
+        local_dict['nx'] = n
+        local_dict['ny'] = n
 
-        f_T_MMS, f_source, f_bc_left, f_bc_right, f_bc_bottom, f_tinf_top = generer_mms_simple(input_dict, afficher_graphiques=False)
+        f_T_MMS, f_source, f_bc_left, f_bc_right, f_bc_bottom, f_tinf_top = generer_mms_simple(local_dict, afficher_graphiques=False)
         
         if order == '1':
-            temperature_sim = solver_first_order(input_dict, sym_test = False, source_mms = f_source, 
+            temperature_sim = solver_first_order(local_dict, sym_test = False, source_mms = f_source, 
                                          bc_left=f_bc_left, bc_right=f_bc_right, bc_bottom=f_bc_bottom, bc_top_tinf=f_tinf_top) 
         
         else: 
-            temperature_sim = solver_second_order(input_dict, scheme, sym_test = False, source_mms = f_source, 
+            temperature_sim = solver_second_order(local_dict, scheme, sym_test = False, source_mms = f_source, 
                                          bc_left=f_bc_left, bc_right=f_bc_right, bc_bottom=f_bc_bottom, bc_top_tinf=f_tinf_top)
 
         
-        temperature_mms = mms_Temperature(input_dict, f_T_MMS)
+        temperature_mms = mms_Temperature(local_dict, f_T_MMS)
         
 
         l1_list_x.append(norm_l1(temperature_sim, temperature_mms))
         l2_list_x.append(norm_l2(temperature_sim, temperature_mms))
         linf_list_x.append(norm_infinity(temperature_sim, temperature_mms))
 
-    graph_error_log(input_dict,discretization_list, l1_list_x, l2_list_x, linf_list_x,1,  
+    graph_error_log(local_dict,discretization_list, l1_list_x, l2_list_x, linf_list_x,1,  
                     'x',
                     save_path=f"results/convergence_x_order_{order}.png",
                     show_fig=True,
