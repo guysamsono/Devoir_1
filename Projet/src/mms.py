@@ -134,9 +134,9 @@ def generer_mms_simple(input_dict: dict, afficher_graphiques: bool = False, save
     return f_T_MMS, f_source, f_bc_left, f_bc_right, f_bc_bottom, f_tinf_top
 
 
-def mms_convergence_analysis(input_dict: dict, order):
+def mms_convergence_analysis(input_dict: dict, order,scheme='central'):
 
-    maille_list = [100,200,500,750]
+    maille_list = [100,200,300]
     discretization_list = [input_dict['b']/(nx-1) for nx in maille_list]
 
     l1_list_x = []
@@ -154,7 +154,7 @@ def mms_convergence_analysis(input_dict: dict, order):
                                          bc_left=f_bc_left, bc_right=f_bc_right, bc_bottom=f_bc_bottom, bc_top_tinf=f_tinf_top) 
         
         else: 
-            temperature_sim = solver_second_order(input_dict, sym_test = False, source_mms = f_source, 
+            temperature_sim = solver_second_order(input_dict, scheme, sym_test = False, source_mms = f_source, 
                                          bc_left=f_bc_left, bc_right=f_bc_right, bc_bottom=f_bc_bottom, bc_top_tinf=f_tinf_top)
 
         
