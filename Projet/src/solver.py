@@ -344,12 +344,9 @@ def mms_temperature(input_dict, mms_func):
     x = np.linspace(0, b, nx)
     y = np.linspace(0, c, ny)
 
-    t_mms_vec = np.zeros(nx*ny)
-
-    for i in range(ny):
-        for j in range(nx):
-            k = i*nx + j
-            t_mms_vec[k] = mms_func(x[j], y[i])
+    x_mesh, y_mesh = np.meshgrid(x, y)
+    t_mms_matrix = mms_func(x_mesh, y_mesh)
+    t_mms_vec = t_mms_matrix.flatten()
 
     return t_mms_vec
 
