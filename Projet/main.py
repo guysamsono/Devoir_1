@@ -18,10 +18,10 @@ from src.solution_verification import solution_verification, post_processing_ver
 if __name__ == "__main__":
     input_dict = gen_input()
 
-    SIMUL_TYPE = 'full_simulation'         #type de simulation à réaliser :
+    SIMUL_TYPE = 'solution_verification'         #type de simulation à réaliser :
                                            # 'symmetry_test' ou 'temperature' ou 'temperature_mms'
                                            # ou 'solution_verification' ou 'full_simulation'
-    ORDER = '2'                            #ordre de la simulation : '1' ou '2'
+    ORDER = '1'                            #ordre de la simulation : '1' ou '2'
 
     if SIMUL_TYPE == 'symmetry_test':
         print('Test de symétrie en cours...')
@@ -45,12 +45,12 @@ if __name__ == "__main__":
                           f"{input_dict['save_path']}/input_parameters_order_{ORDER}.csv")
 
     if SIMUL_TYPE == 'temperature_mms':
-        print('Vérification de la solution en cours...')
+        print('Vérification du code (MMS) en cours...')
         mms_convergence_analysis(input_dict, ORDER, scheme='central')
 
     if SIMUL_TYPE == 'solution_verification':
         print('Vérification de la solution en cours...')
-        solution_verification(input_dict,2, scheme='upwind')
+        solution_verification(input_dict,ORDER, scheme='upwind')
 
     if SIMUL_TYPE == 'post_processing_verification':
         post_processing_verification(input_dict)

@@ -68,6 +68,44 @@ def compute_conservation_of_energy(t_array, input_dict):
 
     return total_flux_conservation
 
+def compute_average_temperature(t_array,input_dict):
+    """
+    Calcule la température moyenne sur le domaine.
+    """
+    ny = input_dict['ny']
+    nx = input_dict['nx']
+
+    t_mesh = np.asarray(t_array).reshape((ny, nx))
+
+    average_temp = np.mean(t_mesh[-1,:])
+
+    return average_temp
+
+
+def compute_temperature_at_y(t_array, input_dict, y_ratio=0.8, x_ratio=0.8):
+    """
+    Calcule la température en un point du domaine situé à y = y_ratio * c
+    et x = x_ratio * b.
+
+    param t_array: tableau 1D des températures
+    param input_dict: dictionnaire contenant nx, ny, b, c
+    param y_ratio: position relative en y (entre 0 et 1)
+    param x_ratio: position relative en x (entre 0 et 1)
+
+    return: température au point choisi
+    """
+    ny = input_dict['ny']
+    nx = input_dict['nx']
+
+    t_mesh = np.asarray(t_array).reshape((ny, nx))
+
+    i = int(round(y_ratio * (ny - 1)))
+    j = int(round(x_ratio * (nx - 1)))
+
+    temperature = t_mesh[i, j]
+
+    return temperature
+
 
 # pylint: disable=too-many-locals
 def compute_boundary_fluxes(t_array, input_dict, margin_ratio=0.2):
@@ -107,7 +145,7 @@ def compute_boundary_fluxes(t_array, input_dict, margin_ratio=0.2):
 
     heat_transfer = np.trapezoid(flux_top_center, dx=dx)
 
-    return 2 * heat_transfer
+    return  heat_transfer
 
 
 # pylint: disable=too-many-arguments, too-many-positional-arguments, too-many-locals

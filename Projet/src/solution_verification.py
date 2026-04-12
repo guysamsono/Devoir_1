@@ -10,7 +10,8 @@ import matplotlib.pyplot as plt
 from src.solver import (
     solver_first_order,
     solver_second_order,
-    compute_boundary_fluxes)
+    compute_boundary_fluxes,
+    compute_average_temperature)
 from src.mms import generer_mms_simple, mms_temperature
 
 def calcul_ordre_convergence_richardson(
@@ -163,10 +164,13 @@ def solution_verification(input_dict, order=2, scheme='central'):
     maille_list = [51, 101, 201, 401, 801]
     local_dict = input_dict.copy()
 
+    order = int(order)
+
     srq_list_temp_centrale = []
     srq_list_temp_max = []
     srq_list_heat_full = []
     srq_list_heat_40 = []
+    srq_list_average_temp = []
 
     for n in maille_list:
         local_dict['nx'] = n
@@ -185,6 +189,8 @@ def solution_verification(input_dict, order=2, scheme='central'):
         srq_list_heat_full.append(heat_transfer_0)
         srq_list_heat_40.append(heat_transfer_40)
 
+        
+
         i_mid = local_dict['ny'] // 2
         j_mid = local_dict['nx'] // 2
         k_mid = i_mid * local_dict['nx'] + j_mid
@@ -192,25 +198,29 @@ def solution_verification(input_dict, order=2, scheme='central'):
         srq_list_temp_centrale.append(temperature[k_mid])
         srq_list_temp_max.append(max(temperature))
 
-    p_rich_tc = calcul_ordre_convergence_richardson(srq_list_temp_centrale, maille_list, order)
-    p_rich_tm = calcul_ordre_convergence_richardson(srq_list_temp_max, maille_list, order)
+        srq_list_average_temp.append(compute_average_temperature(temperature, local_dict))
+
+    #p_rich_tc = calcul_ordre_convergence_richardson(srq_list_temp_centrale, maille_list, order)
+    #p_rich_tm = calcul_ordre_convergence_richardson(srq_list_temp_max, maille_list, order)
     p_rich_hf = calcul_ordre_convergence_richardson(srq_list_heat_full, maille_list, order)
     p_rich_hc = calcul_ordre_convergence_richardson(srq_list_heat_40, maille_list, order)
+    p_rich_at = calcul_ordre_convergence_richardson(srq_list_average_temp, maille_list, order)
 
-    p_hat_temp_centrale = calcul_p_hat(srq_list_temp_centrale, 2)
-    p_hat_temp_max = calcul_p_hat(srq_list_temp_max, 2)
+    #p_hat_temp_centrale = calcul_p_hat(srq_list_temp_centrale, 2)
+    #p_hat_temp_max = calcul_p_hat(srq_list_temp_max, 2)
     p_hat_heat_full = calcul_p_hat(srq_list_heat_full, 2)
     p_hat_heat_central = calcul_p_hat(srq_list_heat_40, 2)
+    p_hat_temp_moyenne = calcul_p_hat(srq_list_average_temp, 2)
 
     print("\n--- Analyse de Vérification de Solution ---")
-    print(
-        f"Ordre central (Richardson): {p_rich_tc:.3f} | "
-        f"Formule simple: {p_hat_temp_centrale:.3f}"
-    )
-    print(
-        f"Ordre max (Richardson): {p_rich_tm:.3f} | "
-        f"Formule simple: {p_hat_temp_max:.3f}"
-    )
+    # print(
+    #     f"Ordre central (Richardson): {p_rich_tc:.3f} | "
+    #     f"Formule simple: {p_hat_temp_centrale:.3f}"
+    # )
+    # print(
+    #     f"Ordre max (Richardson): {p_rich_tm:.3f} | "
+    #     f"Formule simple: {p_hat_temp_max:.3f}"
+    # )
     print(
         f"Ordre flux total (Richardson): {p_rich_hf:.3f} | "
         f"Formule simple: {p_hat_heat_full:.3f}"
@@ -218,6 +228,11 @@ def solution_verification(input_dict, order=2, scheme='central'):
     print(
         f"Ordre flux partiel (Richardson): {p_rich_hc:.3f} | "
         f"Formule simple: {p_hat_heat_central:.3f}"
+    )
+
+    print(
+        f"Ordre température moyenne (Richardson): {p_rich_at:.3f} | "
+        f"Formule simple: {p_hat_temp_moyenne:.3f}"
     )
 
     plot_relative_error_loglog(
@@ -239,6 +254,12 @@ def solution_verification(input_dict, order=2, scheme='central'):
         srq_list_heat_40, maille_list, input_dict,
         title="Erreur relative sur le transfert de chaleur partiel (%)",
         filename="SOLUTION_VERIFICATION/srq_convergence_heat_center.png"
+    )
+
+    plot_relative_error_loglog(
+        srq_list_average_temp, maille_list, input_dict,
+        title="Erreur relative sur la température moyenne (%) sur la condition de Robin",
+        filename="SOLUTION_VERIFICATION/srq_convergence_temp_moyenne.png"   
     )
 
 

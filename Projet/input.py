@@ -8,20 +8,20 @@ def gen_input():
     return: input_dict (dictionnaire contenant les paramètres du problème)
     '''
     input_dict = {
-        'b':20,             #longueur du domaine (x)
-        'c':4,              #demi-largeur du domaine (y)
-        'd':1,              #débit par unité de longueur (m^2/s)
-        'nx':25,            #nombre de points de discrétisation en x
-        'ny':25,            #nombre de points de discrétisation en y
-        'rho':1,            #densité
-        'cp':1,             #chaleur spécifique
-        'k':0.001,          #conductivité thermique
-        'f':10,             #terme source
-        'temp_a':100,       #température à la borne a
-        'temp_b':100,       #température à la borne b
-        'h':100,            #coefficient de transfert thermique sur les cotés du domaine
-        'tinf':40           #température de référence pour les conditions de robin
-    }
+    'b': 0.1,
+    'c': 0.01,
+    'd': 8.0e-5,
+    'nx': 101,
+    'ny': 101,
+    'rho': 998,
+    'cp': 4182,
+    'k': 0.60,
+    'f': 0.0,
+    'temp_a': 313.15,
+    'temp_b': 305.15,
+    'h': 300,
+    'tinf': 293.15
+}
 
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
