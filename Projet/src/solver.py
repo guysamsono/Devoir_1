@@ -59,17 +59,14 @@ def compute_conservation_of_energy(t_array, input_dict):
 
     return total_flux_conservation
 
-def compute_average_temperature(t_array,input_dict):
-    """
-    Calcule la température moyenne sur le domaine.
-    """
-    ny = input_dict['ny']
-    nx = input_dict['nx']
-
+def compute_average_temperature(t_array, input_dict):
+    ny, nx = input_dict['ny'], input_dict['nx']
+    b = input_dict['b']
     t_mesh = np.asarray(t_array).reshape((ny, nx))
+    dx = b / (nx - 1)
 
-    average_temp = np.mean(t_mesh[-1,:])
-
+    # Intégration par la méthode des trapèzes (Ordre 2) au lieu de np.mean (Ordre 1)
+    average_temp = np.trapezoid(t_mesh[-1, :], dx=dx) / b
     return average_temp
 
 
@@ -280,11 +277,22 @@ def solver_second_order(
         offsets = [0, -nx, nx, -1, 1]
 
     elif scheme == 'upwind':
-        # Puisque u >= 0 partout, on applique Upwind à droite.
-        # j_flat == 1 -> Centré. j_flat > 1 -> Upwind.
-        main_diag = np.where(j_flat > 1, -2*diff_x - 2*diff_y - 3*adv_flat, -2*diff_x - 2*diff_y)
-        west_diag = np.where(j_flat[1:] > 1, diff_x + 4*adv_flat[1:], diff_x + adv_flat[1:])
-        east_diag = np.where(j_flat[:-1] == 1, diff_x - adv_flat[:-1], diff_x)
+        # LE SECRET DE LA STABILITÉ EST ICI :
+        # j_flat == 1 -> Upwind ordre 1 (Inconditionnellement stable).
+        # j_flat > 1  -> Upwind ordre 2.
+
+        main_diag = np.where(j_flat > 1,
+                             -2*diff_x - 2*diff_y - 3*adv_flat,
+                             np.where(j_flat == 1,
+                                      -2*diff_x - 2*diff_y - 2*adv_flat,
+                                      -2*diff_x - 2*diff_y))
+
+        west_diag = np.where(j_flat[1:] > 1,
+                             diff_x + 4*adv_flat[1:],
+                             diff_x + 2*adv_flat[1:])
+
+        east_diag = np.full(n_nodes - 1, diff_x)
+
         ww_diag = np.where(j_flat[2:] > 1, -adv_flat[2:], 0.0)
 
         diagonals = [main_diag, south_diag, north_diag, west_diag, east_diag, ww_diag]
