@@ -1,17 +1,23 @@
-from src.solver import *
-from src.error import norm_l1, norm_l2, norm_infinity
-from src.convergence import graph_error_log, print_convergence_table
+"""
+Module de Vérification de Code par la Méthode des Solutions Manufacturées (MMS).
+
+Ce module permet de vérifier la validité de l'implémentation numérique en comparant
+la solution calculée par le solveur à une solution analytique arbitraire (manufacturée).
+Il gère la génération symbolique du terme source, des conditions aux limites
+correspondantes et l'analyse de l'ordre de convergence formel.
+"""
 import os
 import numpy as np
 import matplotlib.pyplot as plt
 import sympy as sp
+from src.solver import (solver_first_order, solver_second_order, mms_Temperature)
+from src.error import norm_l1, norm_l2, norm_infinity
+from src.convergence import graph_error_log, print_convergence_table
 
-
-
-def generer_mms_simple(input_dict: dict, afficher_graphiques: bool = False, save_path: str = "results/MMS"):
+def generer_mms_simple(input_dict: dict, save_path: str = "results/MMS"):
     """
     Génère la solution manufacturée, le terme source et les graphiques associés.
-    
+
     :param input_dict: Dictionnaire des paramètres physiques et d'entrée du problème
     :param afficher_graphique: Booléen pour bloquer/débloquer l'affichage des graphiques (désactiver pour le Bash)
     :return: f_C_MMS, f_source (fonctions lambdifiées utilisables par les solveurs)
@@ -42,7 +48,7 @@ def generer_mms_simple(input_dict: dict, afficher_graphiques: bool = False, save
     T_x = sp.diff(T_MMS, x)
     T_y = sp.diff(T_MMS, y)
     T_xx = sp.diff(T_x, x)
-    T_yy = sp.diff(T_y, y)  
+    T_yy = sp.diff(T_y, y)
 
     # Calcul du terme source S(x,y)
     u_sym = (3*d)/(4*c) * (1 - (y/c)**2)
@@ -99,38 +105,37 @@ def generer_mms_simple(input_dict: dict, afficher_graphiques: bool = False, save
     # Création des maillages spatial pour les graphiques
     xdom = np.linspace(0, b, nx)
     ydom = np.linspace(0, c, ny)
-    xi, yi = np.meshgrid(xdom, ydom, indexing='ij') 
+    xi, yi = np.meshgrid(xdom, ydom, indexing='ij')
 
     # Évaluation des fonctions sur le maillage pour les graphiques
     z_MMS = f_T_MMS(xi, yi)
-    z_source = f_source(xi, yi)     
+    z_source = f_source(xi, yi)
 
     # Graphiques
-    if afficher_graphiques:
-        mms_dir = os.path.join(input_dict['save_path'], "MMS")
-        os.makedirs(mms_dir, exist_ok=True)
+    mms_dir = os.path.join(input_dict['save_path'], "MMS")
+    os.makedirs(mms_dir, exist_ok=True)
 
-        plt.figure(figsize=(8, 4))
-        contour1 = plt.contourf(xdom, ydom, z_MMS.T, 100, cmap='hot')
-        plt.gca().set_aspect('equal', adjustable='box')
-        plt.colorbar(contour1, label='Temperature')
-        plt.title('Temperature distribution for MMS solution')
-        plt.xlabel('x')
-        plt.ylabel('y')
-        plt.tight_layout()
-        plt.savefig(os.path.join(mms_dir, "MMS_solution.png"), dpi=300)
-        plt.close()
+    plt.figure(figsize=(8, 4))
+    contour1 = plt.contourf(xdom, ydom, z_MMS.T, 100, cmap='hot')
+    plt.gca().set_aspect('equal', adjustable='box')
+    plt.colorbar(contour1, label='Temperature')
+    plt.title('Temperature distribution for MMS solution')
+    plt.xlabel('x')
+    plt.ylabel('y')
+    plt.tight_layout()
+    plt.savefig(os.path.join(mms_dir, "MMS_solution.png"), dpi=300)
+    plt.close()
 
-        plt.figure(figsize=(8, 4))
-        contour2 = plt.contourf(xdom, ydom, z_source.T, 100, cmap='viridis')
-        plt.gca().set_aspect('equal', adjustable='box')
-        plt.colorbar(contour2, label='Terme source S(x,y) [W/m³]')
-        plt.title('Source distribution')
-        plt.xlabel('x')
-        plt.ylabel('y')
-        plt.tight_layout()
-        plt.savefig(os.path.join(mms_dir, "MMS_source.png"), dpi=300)
-        plt.close()
+    plt.figure(figsize=(8, 4))
+    contour2 = plt.contourf(xdom, ydom, z_source.T, 100, cmap='viridis')
+    plt.gca().set_aspect('equal', adjustable='box')
+    plt.colorbar(contour2, label='Terme source S(x,y) [W/m³]')
+    plt.title('Source distribution')
+    plt.xlabel('x')
+    plt.ylabel('y')
+    plt.tight_layout()
+    plt.savefig(os.path.join(mms_dir, "MMS_source.png"), dpi=300)
+    plt.close()
 
     return f_T_MMS, f_source, f_bc_left, f_bc_right, f_bc_bottom, f_tinf_top
 
@@ -150,32 +155,30 @@ def mms_convergence_analysis(input_dict: dict, order,scheme='central'):
         local_dict['nx'] = n
         local_dict['ny'] = n
 
-        f_T_MMS, f_source, f_bc_left, f_bc_right, f_bc_bottom, f_tinf_top = generer_mms_simple(local_dict, afficher_graphiques=False)
-        
+        f_T_MMS, f_source, f_bc_left, f_bc_right, f_bc_bottom, f_tinf_top = generer_mms_simple(local_dict)
+
         if order == '1':
-            temperature_sim = solver_first_order(local_dict, sym_test = False, source_mms = f_source, 
-                                         bc_left=f_bc_left, bc_right=f_bc_right, bc_bottom=f_bc_bottom, bc_top_tinf=f_tinf_top) 
-        
-        else: 
-            temperature_sim = solver_second_order(local_dict, scheme, sym_test = False, source_mms = f_source, 
+            temperature_sim = solver_first_order(local_dict, sym_test = False, source_mms = f_source,
                                          bc_left=f_bc_left, bc_right=f_bc_right, bc_bottom=f_bc_bottom, bc_top_tinf=f_tinf_top)
 
-        
+        else:
+            temperature_sim = solver_second_order(local_dict, scheme, sym_test = False, source_mms = f_source,
+                                         bc_left=f_bc_left, bc_right=f_bc_right, bc_bottom=f_bc_bottom, bc_top_tinf=f_tinf_top)
+
+
         temperature_mms = mms_Temperature(local_dict, f_T_MMS)
-        
+
 
         l1_list_x.append(norm_l1(temperature_sim, temperature_mms))
         l2_list_x.append(norm_l2(temperature_sim, temperature_mms))
         linf_list_x.append(norm_infinity(temperature_sim, temperature_mms))
 
-    graph_error_log(local_dict,discretization_list, l1_list_x, l2_list_x, linf_list_x,1,  
+    graph_error_log(local_dict,discretization_list, l1_list_x, l2_list_x, linf_list_x,1,
                     'x',
                     file_name=f"convergence_x_order_{order}.png",
                     show_fig=False,
                     xlabel=r"Taille de maille")
-    
+
     print_convergence_table(maille_list, discretization_list, l1_list_x, str(order), f"L1 en x pour l'ordre")
     print_convergence_table(maille_list, discretization_list, l2_list_x, str(order), f"L2 en x pour l'ordre")
     print_convergence_table(maille_list, discretization_list, linf_list_x, str(order), f"Linf en x pour l'ordre")
-
-    return

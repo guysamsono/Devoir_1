@@ -84,7 +84,7 @@ if __name__ == "__main__":
         print('Vérification de code terminée.\n')
 
         print('--- ÉTAPE 4 : Vérification de solution ---')
-        solution_verification(input_dict, ORDER, scheme='upwind')
+        solution_verification(input_dict, int(ORDER), scheme='upwind')
         print('Vérification de solution terminée.\n')
 
         print('--- ÉTAPE 5 : Post-processing final ---')

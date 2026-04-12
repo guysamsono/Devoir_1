@@ -4,8 +4,6 @@ Fonctions servant à afficher les résultats.
 import os
 import matplotlib.pyplot as plt
 import numpy as np
-import sympy as sp
-from src.error import *
 
 def graph_error_log(input_dict: dict,
                     discretization,
@@ -64,7 +62,7 @@ def graph_error_log(input_dict: dict,
 
     save_full_path = os.path.join(input_dict['save_path'], file_name)
     plt.savefig(save_full_path, dpi=300)
-    
+
     if show_fig:
         plt.show()
     plt.close()
@@ -76,7 +74,7 @@ def print_convergence_table(n_points_list, discretization_list,
                             label):
     '''
     Fonction qui print une table de convergence.
-    
+
     :param n_points_list: liste des nombres de points
     :param dr_list: liste des discretisations
     :param error_list: liste des erreur
