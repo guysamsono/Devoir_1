@@ -190,8 +190,6 @@ def solution_verification(input_dict, order=2, scheme='central'):
         srq_list_heat_full.append(heat_transfer_0)
         srq_list_heat_40.append(heat_transfer_40)
 
-        
-
         i_mid = local_dict['ny'] // 2
         j_mid = local_dict['nx'] // 2
         k_mid = i_mid * local_dict['nx'] + j_mid
@@ -248,7 +246,7 @@ def solution_verification(input_dict, order=2, scheme='central'):
     plot_relative_error_loglog(
         srq_list_average_temp, maille_list, input_dict,
         title="Erreur relative sur la température moyenne (%) sur la condition de Robin",
-        filename="SOLUTION_VERIFICATION/srq_convergence_temp_moyenne.png"   
+        filename="SOLUTION_VERIFICATION/srq_convergence_temp_moyenne.png"
     )
 
     plot_relative_error_loglog(

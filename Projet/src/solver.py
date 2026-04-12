@@ -24,61 +24,49 @@ def speed_function(c, d, y):
 
 # pylint: disable=too-many-locals
 def compute_conservation_of_energy(t_array, input_dict):
-    """
-    Calcule le résidu de la conservation d'énergie globale sur le domaine.
-    """
-    ny = input_dict['ny']
-    nx = input_dict['nx']
-    kappa = input_dict['k']
-    rho = input_dict['rho']
-    cp = input_dict['cp']
-    b = input_dict['b']
-    c = input_dict['c']
-    d = input_dict['d']
-    f = input_dict['f']
+    """Calcule le résidu de la conservation d'énergie globale (Vectorisé)."""
+    ny, nx = input_dict['ny'], input_dict['nx']
+    kappa, rho, cp = input_dict['k'], input_dict['rho'], input_dict['cp']
+    b, c, d, f = input_dict['b'], input_dict['c'], input_dict['d'], input_dict['f']
 
     t_mesh = np.asarray(t_array).reshape((ny, nx))
-
     dx = b / (nx - 1)
     dy = c / (ny - 1)
 
-    total_flux_conservation = 0.0
+    y_coords = np.linspace(0, c, ny)
+    u_edge = speed_function(c, d, y_coords)
 
-    for j in range(ny):
-        u = speed_function(c, d, j * dy)
-        outward_diff = kappa * (t_mesh[j, 1] - t_mesh[j, 0]) / dx * dy
-        outward_conv = -rho*cp*u * t_mesh[j, 0] * dy
-        total_flux_conservation += outward_diff + outward_conv
+    # 1. Bord gauche (x = 0)
+    diff_gauche = kappa * (t_mesh[:, 1] - t_mesh[:, 0]) / dx * dy
+    conv_gauche = -rho * cp * u_edge * t_mesh[:, 0] * dy
 
-    for j in range(ny):
-        u = speed_function(c, d, j * dy)
-        outward_diff = -kappa * (t_mesh[j, -1] - t_mesh[j, -2]) / dx * dy
-        outward_conv = +rho*cp*u * t_mesh[j, -1] * dy
-        total_flux_conservation += outward_diff + outward_conv
+    # 2. Bord droit (x = b)
+    diff_droit = -kappa * (t_mesh[:, -1] - t_mesh[:, -2]) / dx * dy
+    conv_droit = rho * cp * u_edge * t_mesh[:, -1] * dy
 
-    for i in range(nx):
-        outward_diff = kappa * (t_mesh[1, i] - t_mesh[0, i]) / dy * dx
-        total_flux_conservation += outward_diff
+    # 3. Bord bas (y = 0)
+    diff_bas = kappa * (t_mesh[1, :] - t_mesh[0, :]) / dy * dx
 
-    for i in range(nx):
-        outward_diff = -kappa * (t_mesh[-1, i] - t_mesh[-2, i]) / dy * dx
-        total_flux_conservation += outward_diff
+    # 4. Bord haut (y = c)
+    diff_haut = -kappa * (t_mesh[-1, :] - t_mesh[-2, :]) / dy * dx
+
+    total_flux_conservation = (np.sum(diff_gauche + conv_gauche) +
+                               np.sum(diff_droit + conv_droit) +
+                               np.sum(diff_bas) +
+                               np.sum(diff_haut))
 
     total_flux_conservation -= f * b * c
 
     return total_flux_conservation
 
-def compute_average_temperature(t_array,input_dict):
-    """
-    Calcule la température moyenne sur le domaine.
-    """
-    ny = input_dict['ny']
-    nx = input_dict['nx']
-
+def compute_average_temperature(t_array, input_dict):
+    ny, nx = input_dict['ny'], input_dict['nx']
+    b = input_dict['b']
     t_mesh = np.asarray(t_array).reshape((ny, nx))
+    dx = b / (nx - 1)
 
-    average_temp = np.mean(t_mesh[-1,:])
-
+    # Intégration par la méthode des trapèzes (Ordre 2) au lieu de np.mean (Ordre 1)
+    average_temp = np.trapezoid(t_mesh[-1, :], dx=dx) / b
     return average_temp
 
 
@@ -109,40 +97,22 @@ def compute_temperature_at_y(t_array, input_dict, y_ratio=0.8, x_ratio=0.8):
 
 # pylint: disable=too-many-locals
 def compute_boundary_fluxes(t_array, input_dict, margin_ratio=0.2):
-    """
-    Calcule le flux de chaleur à travers la frontière supérieure du domaine.
-    Exclut les coins pour éviter les singularités.
-
-    :param t_array: tableau 1D de la température (taille nx*ny)
-    :param input_dict: dictionnaire contenant les paramètres du problème
-    :param margin_ratio: fraction du domaine à ignorer de chaque côté
-    :return: flux de chaleur à travers la section centrale (float)
-    """
-    ny = input_dict['ny']
-    nx = input_dict['nx']
-    kappa = input_dict['k']
-    b = input_dict['b']
-    c = input_dict['c']
+    """Calcule le flux de chaleur à travers la frontière supérieure (Vectorisé)."""
+    ny, nx = input_dict['ny'], input_dict['nx']
+    kappa, b, c = input_dict['k'], input_dict['b'], input_dict['c']
 
     t_mesh = np.asarray(t_array).reshape((ny, nx))
-
     dx = b / (nx - 1)
     dy = c / (ny - 1)
 
-    flux_top = np.zeros(nx)
-
-    for i in range(nx):
-        dtdy_top = (3*t_mesh[-1, i] - 4*t_mesh[-2, i] + t_mesh[-3, i]) / (2*dy)
-        flux_top[i] = -kappa * dtdy_top
+    flux_top = -kappa * (3*t_mesh[-1, :] - 4*t_mesh[-2, :] + t_mesh[-3, :]) / (2*dy)
 
     x_start = b * margin_ratio
     x_end = b * (1 - margin_ratio)
-
     i_start = int(round(x_start / dx))
     i_end = int(round(x_end / dx))
 
     flux_top_center = flux_top[i_start : i_end + 1]
-
     heat_transfer = np.trapezoid(flux_top_center, dx=dx)
 
     return  heat_transfer
@@ -307,11 +277,22 @@ def solver_second_order(
         offsets = [0, -nx, nx, -1, 1]
 
     elif scheme == 'upwind':
-        # Puisque u >= 0 partout, on applique Upwind à droite.
-        # j_flat == 1 -> Centré. j_flat > 1 -> Upwind.
-        main_diag = np.where(j_flat > 1, -2*diff_x - 2*diff_y - 3*adv_flat, -2*diff_x - 2*diff_y)
-        west_diag = np.where(j_flat[1:] > 1, diff_x + 4*adv_flat[1:], diff_x + adv_flat[1:])
-        east_diag = np.where(j_flat[:-1] == 1, diff_x - adv_flat[:-1], diff_x)
+        # LE SECRET DE LA STABILITÉ EST ICI :
+        # j_flat == 1 -> Upwind ordre 1 (Inconditionnellement stable).
+        # j_flat > 1  -> Upwind ordre 2.
+
+        main_diag = np.where(j_flat > 1,
+                             -2*diff_x - 2*diff_y - 3*adv_flat,
+                             np.where(j_flat == 1,
+                                      -2*diff_x - 2*diff_y - 2*adv_flat,
+                                      -2*diff_x - 2*diff_y))
+
+        west_diag = np.where(j_flat[1:] > 1,
+                             diff_x + 4*adv_flat[1:],
+                             diff_x + 2*adv_flat[1:])
+
+        east_diag = np.full(n_nodes - 1, diff_x)
+
         ww_diag = np.where(j_flat[2:] > 1, -adv_flat[2:], 0.0)
 
         diagonals = [main_diag, south_diag, north_diag, west_diag, east_diag, ww_diag]
@@ -382,12 +363,9 @@ def mms_temperature(input_dict, mms_func):
     x = np.linspace(0, b, nx)
     y = np.linspace(0, c, ny)
 
-    t_mms_vec = np.zeros(nx*ny)
-
-    for i in range(ny):
-        for j in range(nx):
-            k = i*nx + j
-            t_mms_vec[k] = mms_func(x[j], y[i])
+    x_mesh, y_mesh = np.meshgrid(x, y)
+    t_mms_matrix = mms_func(x_mesh, y_mesh)
+    t_mms_vec = t_mms_matrix.flatten()
 
     return t_mms_vec
 
